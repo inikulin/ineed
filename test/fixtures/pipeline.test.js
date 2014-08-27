@@ -33,8 +33,8 @@ var EnvLoggerPlugin = (function () {
         return {
             name: 'envLogger',
 
-            reset: function (envirionment, property) {
-                env = envirionment;
+            reset: function (environment, property) {
+                env = environment;
                 prop = property;
                 results = [];
             },
@@ -72,8 +72,8 @@ var EnvLoggerPlugin = (function () {
         return {
             name: 'fetchWebPageTest',
 
-            reset: function (envirionment) {
-                env = envirionment;
+            reset: function (environment) {
+                env = environment;
             },
 
             onText: function (text) {
@@ -216,9 +216,9 @@ exports['Plugin chain'] = function (t) {
 
     var result = pipeline.fromHtml(src);
 
-    t.strictEqual(JSON.stringify(result['op1']), JSON.stringify(expected1));
-    t.strictEqual(JSON.stringify(result['op2']), JSON.stringify(expected2));
-    t.strictEqual(JSON.stringify(result['op3']), JSON.stringify(expected3));
+    t.deepEqual(result['op1'], expected1);
+    t.deepEqual(result['op2'], expected2);
+    t.deepEqual(result['op3'], expected3);
 
     t.done();
 };
@@ -263,7 +263,7 @@ exports['EnvironmentPlugin - inBody'] = function (t) {
     sources.forEach(function (src, i) {
         var result = pipeline.fromHtml(src);
 
-        t.strictEqual(JSON.stringify(result['envLogger']), JSON.stringify(expected[i]));
+        t.deepEqual(result['envLogger'],expected[i]);
     });
 
     t.done();
@@ -283,7 +283,7 @@ exports['EnvironmentPlugin - leadingStartTag'] = function (t) {
 
     var result = pipeline.fromHtml(src);
 
-    t.strictEqual(JSON.stringify(result['envLogger']), JSON.stringify(expected));
+    t.deepEqual(result['envLogger'], expected);
 
     t.done();
 };
@@ -304,10 +304,10 @@ exports['EnvironmentPlugin - baseUrl'] = function (t) {
     pipeline.pluginResetArgs[EnvLoggerPlugin] = ['baseUrl'];
 
     var result = pipeline.fromHtml(src);
-    t.strictEqual(JSON.stringify(result['envLogger']), JSON.stringify(expected1));
+    t.deepEqual(result['envLogger'], expected1);
 
     result = pipeline.fromHtml(src, 'http://www.test.test');
-    t.strictEqual(JSON.stringify(result['envLogger']), JSON.stringify(expected2));
+    t.deepEqual(result['envLogger'], expected2);
 
     t.done();
 };
