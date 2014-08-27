@@ -3,7 +3,12 @@
     "parse5": "1.1.2",
     "request": "2.40.0"
   },
+
   "devDependencies": {
     "nodeunit": "0.9.0"
+  },
+
+  "scripts": {
+    "test": "node test/run_tests.js"
   }
 }
