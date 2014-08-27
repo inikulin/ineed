@@ -280,3 +280,5 @@ exports['EnvironmentPlugin - baseUrl'] = function (t) {
 
     t.done();
 };
+
+//TODO test .from
