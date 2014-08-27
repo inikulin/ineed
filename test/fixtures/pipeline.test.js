@@ -231,7 +231,8 @@ exports['EnvironmentPlugin - inBody'] = function (t) {
             '<!doctype html><html><head>Test<div></div></html>',
             '<!doctype html><html><head><!--Comment--><base></head><div></div></html>',
             '<!doctype html><html><head><title>Test</title><style>.test{}</style></head><body>Yo!</body></html>',
-            '<title>42</title><script/>Test'
+            '<title>42</title><script/>Test',
+            '  <head>\n<link>\t</head><body>'
         ],
         expected = [
             [
@@ -254,6 +255,9 @@ exports['EnvironmentPlugin - inBody'] = function (t) {
             ],
             [
                 'title:false', '42:false', 'title:false', 'script:false', 'Test:true'
+            ],
+            [
+                '  :false', 'head:false', '\n:false', 'link:false', '\t:false', 'head:true', 'body:true'
             ]
         ];
 
@@ -263,7 +267,7 @@ exports['EnvironmentPlugin - inBody'] = function (t) {
     sources.forEach(function (src, i) {
         var result = pipeline.fromHtml(src);
 
-        t.deepEqual(result['envLogger'],expected[i]);
+        t.deepEqual(result['envLogger'], expected[i]);
     });
 
     t.done();

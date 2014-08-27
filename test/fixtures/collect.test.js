@@ -44,3 +44,25 @@ exports['.cssCode'] = function (t) {
 
     t.done();
 };
+
+exports['.hyperlinks'] = function (t) {
+    var collector = iwant.collect.hyperlinks,
+        expected = [
+            {
+                href: 'http://www.yo.dawg/come/get/some',
+                text: 'ullamco laboris'
+            },
+            {
+                href: 'http://www.go.away/',
+                text: 'reprehenderit in voluptate'
+            }
+        ];
+
+    var results = collector.fromHtml(html);
+    t.deepEqual(results.hyperlinks, expected);
+
+    results = collector.fromHtml(emptyHtml);
+    t.deepEqual(results.hyperlinks, []);
+
+    t.done();
+};
