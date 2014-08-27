@@ -1,12 +1,16 @@
 var util = require('util'),
+    http = require('http'),
     Pipeline = require('../../lib/pipeline');
+
 
 //Test pipeline
 var TestPipeline = function () {
     Pipeline.call(this);
 };
 
+
 util.inherits(TestPipeline, Pipeline);
+
 
 TestPipeline.prototype._aggregatePluginResults = function () {
     var result = {};
@@ -19,47 +23,74 @@ TestPipeline.prototype._aggregatePluginResults = function () {
     return result;
 };
 
-//EnvironmentPlugin logging operator
-var EnvLogger = (function () {
-    var results = null,
-        env = null,
-        prop = null;
 
-    return {
-        name: 'envLogger',
+//Test plugins
+var EnvLoggerPlugin = (function () {
+        var results = null,
+            env = null,
+            prop = null;
 
-        reset: function (envirionment, property) {
-            env = envirionment;
-            prop = property;
-            results = [];
-        },
+        return {
+            name: 'envLogger',
 
-        onDoctype: function (doctype) {
-            results.push(doctype.name + ':' + env[prop]);
-        },
+            reset: function (envirionment, property) {
+                env = envirionment;
+                prop = property;
+                results = [];
+            },
 
-        onStartTag: function (startTag) {
-            results.push(startTag.tagName + ':' + env[prop]);
-        },
+            onDoctype: function (doctype) {
+                results.push(doctype.name + ':' + env[prop]);
+            },
 
-        onEndTag: function (tagName) {
-            results.push(tagName + ':' + env[prop]);
-        },
+            onStartTag: function (startTag) {
+                results.push(startTag.tagName + ':' + env[prop]);
+            },
 
-        onText: function (text) {
-            results.push(text + ':' + env[prop]);
-        },
+            onEndTag: function (tagName) {
+                results.push(tagName + ':' + env[prop]);
+            },
 
-        onComment: function (comment) {
-            results.push(comment + ':' + env[prop]);
-        },
+            onText: function (text) {
+                results.push(text + ':' + env[prop]);
+            },
 
-        getResult: function () {
-            return results;
-        }
-    };
-})();
+            onComment: function (comment) {
+                results.push(comment + ':' + env[prop]);
+            },
 
+            getResult: function () {
+                return results;
+            }
+        };
+    })(),
+
+    FetchWebPageTestPlugin = (function () {
+        var env = null,
+            pageText = null;
+
+        return {
+            name: 'fetchWebPageTest',
+
+            reset: function (envirionment) {
+                env = envirionment;
+            },
+
+            onText: function (text) {
+                pageText = text;
+            },
+
+            getResult: function () {
+                return {
+                    baseUrl: env.baseUrl,
+                    pageText: pageText
+                };
+            }
+        };
+    })();
+
+
+//Tests
 exports['Plugin chain'] = function (t) {
     var pipeline = new TestPipeline(),
         src = '<!doctype html><html><head><title>42</title><!--hey--></head></html>',
@@ -226,8 +257,8 @@ exports['EnvironmentPlugin - inBody'] = function (t) {
             ]
         ];
 
-    pipeline.plugins.push(EnvLogger);
-    pipeline.pluginResetArgs[EnvLogger] = ['inBody'];
+    pipeline.plugins.push(EnvLoggerPlugin);
+    pipeline.pluginResetArgs[EnvLoggerPlugin] = ['inBody'];
 
     sources.forEach(function (src, i) {
         var result = pipeline.fromHtml(src);
@@ -247,8 +278,8 @@ exports['EnvironmentPlugin - leadingStartTag'] = function (t) {
             '42:script', 'script:undefined', 'Test:undefined', 'html:undefined'
         ];
 
-    pipeline.plugins.push(EnvLogger);
-    pipeline.pluginResetArgs[EnvLogger] = ['leadingStartTag'];
+    pipeline.plugins.push(EnvLoggerPlugin);
+    pipeline.pluginResetArgs[EnvLoggerPlugin] = ['leadingStartTag'];
 
     var result = pipeline.fromHtml(src);
 
@@ -269,8 +300,8 @@ exports['EnvironmentPlugin - baseUrl'] = function (t) {
             'html:http://www.test.test/test/path'
         ];
 
-    pipeline.plugins.push(EnvLogger);
-    pipeline.pluginResetArgs[EnvLogger] = ['baseUrl'];
+    pipeline.plugins.push(EnvLoggerPlugin);
+    pipeline.pluginResetArgs[EnvLoggerPlugin] = ['baseUrl'];
 
     var result = pipeline.fromHtml(src);
     t.strictEqual(JSON.stringify(result['envLogger']), JSON.stringify(expected1));
@@ -281,4 +312,58 @@ exports['EnvironmentPlugin - baseUrl'] = function (t) {
     t.done();
 };
 
-//TODO test .from
+var server = null;
+
+exports['Fetch web page'] = {
+    setUp: function (done) {
+        server = http.createServer(function (req, res) {
+            var appendText = req.headers['x-append-text'] || '';
+            res.end('<html><title>Hey ya' + appendText + '!</title></html>');
+        });
+
+        server.listen(0, '127.0.0.1');
+        server.on('listening', done);
+    },
+
+    tearDown: function (done) {
+        if (server)
+            server.close(done);
+    },
+
+    'Without parameters': function (t) {
+        var pipeline = new TestPipeline(),
+            reqUrl = 'http://127.0.0.1:' + server.address().port;
+
+        pipeline.plugins.push(FetchWebPageTestPlugin);
+
+        pipeline.from(reqUrl, function (err, response, result) {
+            t.ok(!err);
+            t.ok(response);
+            t.strictEqual(result['fetchWebPageTest'].baseUrl, reqUrl);
+            t.strictEqual(result['fetchWebPageTest'].pageText, 'Hey ya!');
+
+            t.done();
+        });
+    },
+
+    'With parameters': function (t) {
+        var pipeline = new TestPipeline(),
+            reqUrl = 'http://127.0.0.1:' + server.address().port;
+
+        pipeline.plugins.push(FetchWebPageTestPlugin);
+
+        pipeline.from({
+            url: 'http://127.0.0.1:' + server.address().port,
+            headers: {
+                'x-append-text': ', folks'
+            }
+        }, function (err, response, result) {
+            t.ok(!err);
+            t.ok(response);
+            t.strictEqual(result['fetchWebPageTest'].baseUrl, reqUrl);
+            t.strictEqual(result['fetchWebPageTest'].pageText, 'Hey ya, folks!');
+
+            t.done();
+        });
+    }
+};
