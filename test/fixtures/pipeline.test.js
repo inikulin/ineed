@@ -19,7 +19,7 @@ TestPipeline.prototype._aggregatePluginResults = function () {
     return result;
 };
 
-//Environment logging operator
+//EnvironmentPlugin logging operator
 var EnvLogger = (function () {
     var results = null,
         env = null,
@@ -192,7 +192,7 @@ exports['Plugin chain'] = function (t) {
     t.done();
 };
 
-exports['Environment - inBody'] = function (t) {
+exports['EnvironmentPlugin - inBody'] = function (t) {
     var pipeline = new TestPipeline(),
         sources = [
             '<!doctype html><html><head><title>Test</title><script>var a = 3;</script></head>Yo!</html>',
@@ -238,7 +238,7 @@ exports['Environment - inBody'] = function (t) {
     t.done();
 };
 
-exports['Environment - leadingStartTag'] = function (t) {
+exports['EnvironmentPlugin - leadingStartTag'] = function (t) {
     var pipeline = new TestPipeline(),
         src = '<!doctype html><html><head><title></title><meta/></head><body><!--42--><script>42</script>Test</html>',
         expected = [
@@ -257,7 +257,7 @@ exports['Environment - leadingStartTag'] = function (t) {
     t.done();
 };
 
-exports['Environment - baseUrl'] = function (t) {
+exports['EnvironmentPlugin - baseUrl'] = function (t) {
     var pipeline = new TestPipeline(),
         src = '<!doctype html><html><head><base href="/test/path"></head></html>',
         expected1 = [
