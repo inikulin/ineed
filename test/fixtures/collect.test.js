@@ -169,10 +169,10 @@ exports['.title'] = function (t) {
         expected = 'Yo!';
 
     var results = collector.fromHtml(html);
-    t.deepEqual(results.title, expected);
+    t.strictEqual(results.title, expected);
 
     results = collector.fromHtml(emptyHtml);
-    t.deepEqual(results.title, '');
+    t.strictEqual(results.title, '');
 
     t.done();
 };
