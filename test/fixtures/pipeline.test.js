@@ -277,9 +277,9 @@ exports['EnvironmentPlugin - leadingStartTag'] = function (t) {
     var pipeline = new TestPipeline(),
         src = '<!doctype html><html><head><title></title><meta/></head><body><!--42--><script>42</script>Test</html>',
         expected = [
-            'html:undefined', 'html:html', 'head:head', 'title:title', 'title:undefined',
-            'meta:undefined', 'head:undefined', 'body:body', '42:body', 'script:script',
-            '42:script', 'script:undefined', 'Test:undefined', 'html:undefined'
+            'html:null', 'html:html', 'head:head', 'title:title', 'title:null',
+            'meta:null', 'head:null', 'body:body', '42:body', 'script:script',
+            '42:script', 'script:null', 'Test:null', 'html:null'
         ];
 
     pipeline.plugins.push(EnvLoggerPlugin);
