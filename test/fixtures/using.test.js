@@ -20,7 +20,7 @@ function getCodeBlockErrMsg(block) {
 //Tests
 exports['Missing .name'] = function (t) {
     var err = getCodeBlockErrMsg(function () {
-        iwant.using({extends: 'modify'});
+        iwant.using({extends: 'reprocess'});
     });
 
     t.strictEqual(err, ApiHost.ERR_PLUGIN_MISSING_NAME_PROPERTY);
@@ -60,7 +60,7 @@ exports['Missing .getCollection()'] = function (t) {
     err = getCodeBlockErrMsg(function () {
         iwant.using({
             name: 'coolPlugin',
-            extends: 'modify'
+            extends: 'reprocess'
         });
     });
 
@@ -78,15 +78,15 @@ exports['Duplicate name'] = function (t) {
             }
         },
 
-        modifyPlugin = {
-            name: 'modify_plugin',
-            extends: 'modify'
+        reprocessPlugin = {
+            name: 'reprocess_plugin',
+            extends: 'reprocess'
         };
 
     var err = getCodeBlockErrMsg(function () {
         iwant
             .using(collectPlugin)
-            .using(modifyPlugin)
+            .using(reprocessPlugin)
             .using(collectPlugin);
     });
 
@@ -95,18 +95,18 @@ exports['Duplicate name'] = function (t) {
     err = getCodeBlockErrMsg(function () {
         iwant
             .using(collectPlugin)
-            .using(modifyPlugin)
-            .using(modifyPlugin);
+            .using(reprocessPlugin)
+            .using(reprocessPlugin);
     });
 
-    t.strictEqual(err, util.format(ApiHost.ERR_DUPLICATE_PLUGIN_NAME, 'modify_plugin', 'modify'));
+    t.strictEqual(err, util.format(ApiHost.ERR_DUPLICATE_PLUGIN_NAME, 'reprocess_plugin', 'reprocess'));
 
     err = getCodeBlockErrMsg(function () {
         iwant
             .using(collectPlugin)
             .using({
                 name: 'collect_plugin',
-                extends: 'modify'
+                extends: 'reprocess'
             })
     });
 
@@ -149,13 +149,13 @@ exports['Extend .collect()'] = function (t) {
     t.done();
 };
 
-exports['Extend .modify()'] = function (t) {
+exports['Extend .reprocess()'] = function (t) {
     var wordsPlugin = (function () {
         var op = null;
 
         return {
             name: 'answer',
-            extends: 'modify',
+            extends: 'reprocess',
 
             reset: function (env, operator) {
                 op = operator;
@@ -171,7 +171,7 @@ exports['Extend .modify()'] = function (t) {
 
     var html = '<body><div>The<span>answer</span></div> is<span> 42</span></body>',
         expected = '<body><div>The<span>answer</span></div> is<span> 24</span></body>',
-        result = iwant.using(wordsPlugin).modify.answer(function () {
+        result = iwant.using(wordsPlugin).reprocess.answer(function () {
             return '24';
         }).fromHtml(html);
 

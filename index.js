@@ -13,14 +13,14 @@ module.exports = new ApiHost(
         require('./lib/plugins/collecting/title')
     ],
     [
-        require('./lib/plugins/modifying/comments'),
-        require('./lib/plugins/modifying/css_code'),
-        require('./lib/plugins/modifying/hyperlinks'),
-        require('./lib/plugins/modifying/images'),
-        require('./lib/plugins/modifying/js_code'),
-        require('./lib/plugins/modifying/scripts'),
-        require('./lib/plugins/modifying/stylesheets'),
-        require('./lib/plugins/modifying/texts'),
-        require('./lib/plugins/modifying/title')
+        require('./lib/plugins/reprocessing/comments'),
+        require('./lib/plugins/reprocessing/css_code'),
+        require('./lib/plugins/reprocessing/hyperlinks'),
+        require('./lib/plugins/reprocessing/images'),
+        require('./lib/plugins/reprocessing/js_code'),
+        require('./lib/plugins/reprocessing/scripts'),
+        require('./lib/plugins/reprocessing/stylesheets'),
+        require('./lib/plugins/reprocessing/texts'),
+        require('./lib/plugins/reprocessing/title')
     ]
 );
