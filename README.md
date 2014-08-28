@@ -2,7 +2,7 @@
 
 [![Build Status](http://img.shields.io/travis/inikulin/iwant.svg?style=flat-square)](https://travis-ci.org/inikulin/iwant)
 
-*Scraping and HTML-reprocessing. The easy way.*
+*Web scraping and HTML-reprocessing. The easy way.*
 
 
 `iwant` allows you collect useful data from web pages using simple and fancy API. Let's collect images, hyperlinks, scripts and stylesheets from www.google.com:
