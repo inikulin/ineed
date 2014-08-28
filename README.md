@@ -2,20 +2,17 @@
 
 [![Build Status](http://img.shields.io/travis/inikulin/iwant.svg?style=flat-square)](https://travis-ci.org/inikulin/iwant)
 
-HTML-page scraping and reprocessing. The easy way.
+*Scraping and HTML-reprocessing. The easy way.*
 
-`iwant` allows you collect useful data from web pages using simple and fancy API. Let's collect images, hyperlinks, script and stylesheet URLs from www.google.com:
+
+`iwant` allows you collect useful data from web pages using simple and fancy API. Let's collect images, hyperlinks, scripts and stylesheets from www.google.com:
 
 ```js
 
 var iwant = require('iwant');
 
-iwant.collect
-    .images
-    .scripts
-    .stylesheets
-    .hyperlinks
-    .from('http://www.google.com', function(err, response, results) {
+iwant.collect.images.hyperlinks.scripts.stylesheets.from('http://www.google.com', 
+    function(err, response, results) {
         console.log(results);
     });
 
