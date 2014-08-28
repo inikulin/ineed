@@ -12,8 +12,8 @@
 
 var iwant = require('iwant');
 
-iwant.collect.images.hyperlinks.scripts.stylesheets.from('http://www.google.com', 
-    function(err, response, results) {
+iwant.collect.images.hyperlinks.scripts.stylesheets.from('http://www.google.com',
+    function (err, response, results) {
         console.log(results);
     });
 
