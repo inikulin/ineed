@@ -4,7 +4,7 @@
 
 HTML-page scraping and reprocessing. The easy way.
 
-`iwant` allows you collect useful data from web pages using simple and fancy API. Let's collect all images, hyperlinks, script and stylesheet URLs from www.google.com:
+`iwant` allows you collect useful data from web pages using simple and fancy API. Let's collect images, hyperlinks, script and stylesheet URLs from www.google.com:
 
 ```js
 
