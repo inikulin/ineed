@@ -9,6 +9,6 @@
   },
 
   "scripts": {
-    "test": "node test/run_tests.js"
+    "benchmark": "node index.js"
   }
 }

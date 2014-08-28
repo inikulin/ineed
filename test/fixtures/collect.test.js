@@ -176,3 +176,19 @@ exports['.title'] = function (t) {
 
     t.done();
 };
+
+exports['Multiple plugins'] = function (t) {
+    var collector = iwant.collect.images.scripts.stylesheets,
+        result = collector.fromHtml(html);
+
+    //NOTE: check that chaining doesn't affect individual results
+    t.deepEqual(result.images, iwant.collect.images.fromHtml(html).images);
+    t.deepEqual(result.scripts, iwant.collect.scripts.fromHtml(html).scripts);
+    t.deepEqual(result.stylesheets, iwant.collect.stylesheets.fromHtml(html).stylesheets);
+
+    //NOTE: check that duplicate plugins are ignored
+    collector = collector.images.scripts.stylesheets;
+    t.deepEqual(collector.fromHtml(html), result);
+
+    t.done();
+};
