@@ -7,22 +7,26 @@
 var iwant = require('iwant');
 
 iwant.collect
-    .images
-    .scripts
-    .stylesheets
-    .hyperlinks
-    .from('http://google.com', function(err, response, results) {
-        console.log(results);
-    });
+     .images
+     .scripts
+     .stylesheets
+     .hyperlinks
+     .from('http://google.com', function(err, response, results) {
+         console.log(results);
+     });
 
 ```
 
 ```js
 var iwant = require('iwant'),
     stylus = require('stylus'),
+    marked = require('marked'),
     html = '!!!TODO!!!';
   
-var result = iwant.modify.cssCode(stylus).fromHtml(html);
+var result = iwant.modify
+                  .cssCode(stylus)
+                  .texts(marked)
+                  .fromHtml(html);
 
 console.log(html);
 ```
