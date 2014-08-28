@@ -34,4 +34,4 @@ var resultHtml = iwant.reprocess.cssCode(stylus).texts(marked).fromHtml(html);
 console.log(processedHtml);
 ```
 
-`iwant` provides a wide variety of built-in collectors and reprocessors which covers most common use cases. However, if you feel that something is missing, then you can easily extend it with custom plugins.   
+`iwant` provides built-in collectors and reprocessors that covers a wide variety of common use cases. However, if you feel that something is missing, then you can easily extend it with custom plugins.   
