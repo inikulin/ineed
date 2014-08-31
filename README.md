@@ -101,11 +101,18 @@ And the `resultHtml` will be:
 $ npm install iwant
 ```
 
+##API
+In general `iwant` API has the following form:
+
+#####```iwant.<action>[.<plugin>...].<from* method>```
+
+###from* methods
+#####.from(html)
+
 ##Testing
 ```
 $ npm test
 ```
-
 
 ##Questions or suggestions?
 If you have any questions, please feel free to create an issue [here on github](https://github.com/inikulin/iwant/issues).
