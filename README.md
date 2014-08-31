@@ -105,10 +105,16 @@ $ npm install iwant
 The general form:
 
 ####```iwant.<action>[.<plugin>...].<from*>```
----------------------------------------
 
-###.from(html) 
+
+
+####.from(html) 
 Synchronous method. Receives `html` string as an argument and returns `result` of the action.
+
+*Example:*
+```js
+var result = iwant.collect.texts().from('<div>Hey ya</div>');
+```
 
 ##Testing
 ```
