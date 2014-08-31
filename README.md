@@ -142,10 +142,10 @@ Built-in plugins:
 .comments| Collects HTML comments| Array of comment string
 .cssCode| Collects CSS code enclosed in `<style>` tags| Array of CSS code strings
 .hyperlinks| Collects URL (*see remark below*) and text of the hyperlinks | Array of `{href:[String], text:[String]}` objects 
-.images| Collects absolute URL(*see remark below*) and `alt` attribute of the images | Array of `{src:[String], alt:[String]}` objects 
+.images| Collects absolute URL (*see remark below*) and `alt` attribute of the images | Array of `{src:[String], alt:[String]}` objects 
 .jsCode| Collects JavaScript code enclosed in `<script>` tags |Array of JavaScript code strings
-.scripts |Collects URL(*see remark below*) of the external `.js`-files, specified via `<script>` tags with `src` attribute  | Array of script URLs
-.stylesheets| Collects URL(*see remark below*) of the external `*.css`-files, specified via `<link>` tag| Array of stylesheet URLs
+.scripts |Collects URL (*see remark below*) of the external `.js`-files, specified via `<script>` tags with `src` attribute  | Array of script URLs
+.stylesheets| Collects URL (*see remark below*) of the external `*.css`-files, specified via `<link>` tag| Array of stylesheet URLs
 .texts| Collects all text nodes in `<body>` of the document with except for `<script>` and `<style>` tag's content. Speaking clearly: all end-user visible text.  | Array of text strings
 .title| Collects document title | Document title string
 
