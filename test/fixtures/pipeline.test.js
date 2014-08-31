@@ -262,7 +262,7 @@ exports['EnvironmentPlugin - inBody'] = function (t) {
         ];
 
     pipeline.plugins.push(EnvLoggerPlugin);
-    pipeline.pluginResetArgs[EnvLoggerPlugin] = ['inBody'];
+    pipeline.pluginResetArgs[EnvLoggerPlugin.name] = ['inBody'];
 
     sources.forEach(function (src, i) {
         var result = pipeline.fromHtml(src);
@@ -283,7 +283,7 @@ exports['EnvironmentPlugin - leadingStartTag'] = function (t) {
         ];
 
     pipeline.plugins.push(EnvLoggerPlugin);
-    pipeline.pluginResetArgs[EnvLoggerPlugin] = ['leadingStartTag'];
+    pipeline.pluginResetArgs[EnvLoggerPlugin.name] = ['leadingStartTag'];
 
     var result = pipeline.fromHtml(src);
 
@@ -305,7 +305,7 @@ exports['EnvironmentPlugin - baseUrl'] = function (t) {
         ];
 
     pipeline.plugins.push(EnvLoggerPlugin);
-    pipeline.pluginResetArgs[EnvLoggerPlugin] = ['baseUrl'];
+    pipeline.pluginResetArgs[EnvLoggerPlugin.name] = ['baseUrl'];
 
     var result = pipeline.fromHtml(src);
     t.deepEqual(result['envLogger'], expected1);
