@@ -106,15 +106,36 @@ The general form:
 
 ####```iwant.<action>[.<plugin>...].<from*>```
 
-
+---------------------------------------
 ###from* methods
-####.from(html)
+#####.fromHtml(html)
 Accepts `html` string as an argument and synchronously returns `result` of the action.
 
 *Example:*
 ```js
-var result = iwant.collect.texts().from('<div>Hey ya</div>');
+var result = iwant.collect.texts.from('<div>Hey ya</div>');
 ```
+
+#####.from(options, callback)
+Asynchronously loads specified page and invokes `callback(err, response, result)`. It passes `response` object to `callback` in case if you need response headers or status codes. The first argument can be either a `url` or an `options` object.
+The set of options is the same as in @mikeal's [request](https://github.com/mikeal/request#requestoptions-callback), so you can use POST method, set request headers or do any other advanced setup for the page request.
+
+###.collect action
+Collects information specified by plugins set. The `result` of the action is an object that contains individual plugin results as an properties.
+
+*Example*:
+```js
+var result = iwant.collect.texts.images.scripts.fromHtml(html);
+```
+will produce `result`:
+```js
+{
+    "texts" : <collected texts>,
+    "images" : <collected images>,
+    "scripts" : <collected scripts>
+}
+```
+####Plugins:
 
 ##Testing
 ```
