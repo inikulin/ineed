@@ -101,7 +101,7 @@ And the `resultHtml` will be:
 $ npm install iwant
 ```
 
-##API
+##Usage
 The general form:
 
 ####```iwant.<action>[.<plugin>...].<from*>```
@@ -121,7 +121,7 @@ Asynchronously loads specified page and invokes `callback(err, response, result)
 The set of options is the same as in @mikeal's [request](https://github.com/mikeal/request#requestoptions-callback), so you can use POST method, set request headers or do any other advanced setup for the page request.
 
 ###.collect action
-Collects information specified by plugins set. The `result` of the action is an object that contains individual plugin outputs as an properties.
+Collects information specified by plugin set. The `result` of the action is an object that contains individual plugin outputs as an properties.
 
 *Example*:
 ```js
