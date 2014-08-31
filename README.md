@@ -102,11 +102,13 @@ $ npm install iwant
 ```
 
 ##API
+The general form:
+
 ####```iwant.<action>[.<plugin>...].<from*>```
 ---------------------------------------
 
-###&bull; from* methods
-#####.from(html)
+###.from(html) 
+Synchronous method. Receives `html` string as an argument and returns `result` of the action.
 
 ##Testing
 ```
