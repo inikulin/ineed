@@ -135,7 +135,7 @@ will produce `result`:
     "scripts" : <collected scripts>
 }
 ```
-**Plugins:**
+Built-in plugins:
 
 | Plugin        | Description           | Output  |
 --- | --- | ---
