@@ -144,7 +144,7 @@ Built-in plugins:
 .hyperlinks| Collects absolute (there possible, considering page `<base>` tag) URL and text of the hyperlinks | Array of `{href:[String], text:[String]}` objects 
 .images| Collects absolute (there possible, considering page `<base>` tag) URL and `alt` attribute of the images | Array of `{src:[String], alt:[String]}` objects 
 .jsCode| Collects JavaScript code enclosed in `<script>` tags |Array of JavaScript code strings
-.scripts |Collects absolute (there possible, considering page `<base>` tag) URL of the `<script>`s with `src`  | Array of script URLs
+.scripts |Collects absolute (there possible, considering page `<base>` tag) URL of the external `.js`-files, specified via `<script>` tags with `src` attribute  | Array of script URLs
 .stylesheets| Collects absolute (there possible, considering page `<base>` tag) URL of the external `*.css`-files, specified via `link` tag| Array of stylesheet URLs
 .texts| Collects all text nodes in `<body>` of the document with except for `<script>`s and `<style>`s text nodes. Speaking clearly: all end-user visible text.  | Array of text strings
 .title| Collects document title | Document title string
