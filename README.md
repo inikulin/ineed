@@ -50,6 +50,10 @@ This is an H1
 Let's render it's `<style>` with [stylus](https://github.com/learnboost/stylus) and convert text from Markdown to HTML using [marked](https://github.com/chjj/marked) then assemble results back to HTML: 
 
 ```js
+var iwant = require('iwant'),
+    stylus = require('stylus'),
+    marked = require('marked');
+
 function renderStylus(code) {
     var css = null;
 
