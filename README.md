@@ -107,9 +107,9 @@ The general form:
 ####```iwant.<action>[.<plugin>...].<from*>```
 
 
-
-####.from(html) 
-Synchronous method. Receives `html` string as an argument and returns `result` of the action.
+###from* methods
+####.from(html)
+Accepts `html` string as an argument and synchronously returns `result` of the action.
 
 *Example:*
 ```js
