@@ -102,7 +102,7 @@ $ npm install iwant
 ```
 
 ##API
-#####iwant.`<`action`>`[.`<`plugin`>`...].`<`[from*](#-from-methods)`>`
+####```iwant.<action>[.<plugin>...].<from*>```
 
 ###&bull; from* methods
 ---------------------------------------
