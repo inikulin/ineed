@@ -13,8 +13,8 @@
 var iwant = require('iwant');
 
 iwant.collect.images.hyperlinks.scripts.stylesheets.from('http://www.google.com',
-    function (err, response, results) {
-        console.log(results);
+    function (err, response, result) {
+        console.log(result);
     });
 
 ```
@@ -113,12 +113,30 @@ Accepts `html` string as an argument and synchronously returns `result` of the a
 
 *Example:*
 ```js
-var result = iwant.collect.texts.from('<div>Hey ya</div>');
+var result = iwant.collect.texts.fromHtml('<div>Hey ya</div>');
 ```
 
 #####.from(options, callback)
 Asynchronously loads specified page and invokes `callback(err, response, result)`. It passes `response` object to `callback` in case if you need response headers or status codes. The first argument can be either a `url` or an `options` object.
 The set of options is the same as in @mikeal's [request](https://github.com/mikeal/request#requestoptions-callback), so you can use POST method, set request headers or do any other advanced setup for the page request.
+
+*Examples:*
+```js
+iwant.collect.jsCode.from('https://github.com', function (err, response, result) {
+    console.log(response.statusCode);
+    console.log(response.headers);    
+});
+```
+```js
+iwant.collect.title.from({
+    url: 'https://test.domain/',
+    method: 'POST',
+    form: 'input=test'
+}, function (err, response, result) {
+    console.log(result);
+});
+
+```
 
 ###.collect action
 Collects information specified by plugin set. The `result` of the action is an object that contains individual plugin outputs as properties.
