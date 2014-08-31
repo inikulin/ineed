@@ -102,11 +102,9 @@ $ npm install iwant
 ```
 
 ##API
-In general `iwant` API has the following form:
-
 #####```iwant.<action>[.<plugin>...].<from* method>```
 
-###from* methods
+###&bull; from* methods
 #####.from(html)
 
 ##Testing
