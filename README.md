@@ -155,7 +155,7 @@ will produce `result`:
 ```
 Built-in plugins:
 
-| Plugin        | Description           | Output |
+| Plugin|Description| Output |
 --- | --- | ---
 `.comments`| Collects HTML comments| Array of comment string
 `.cssCode`| Collects CSS code enclosed in `<style>` tags| Array of CSS code strings
@@ -187,17 +187,17 @@ var result = iwant.reprocess
 
 Built-in plugins:
 
-| Plugin        | `replacer` arguments | Description |
+| Plugin        | `replacer` signature | Description |
 --- | --- | ---
-`.comments(replacer)`| | 
-`.cssCode(replacer)`| | 
-`.hyperlinks(replacer`)|| 
-`.images(replacer)`|  |  
-`.jsCode(replacer)`| |
-`.scripts(replacer)` | | 
-`.stylesheets(replacer)`| |
-`.texts(replacer)`| |
-`.title(replacer)`| | 
+`.comments(replacer)`|`replacer(commentString)` | Replaces HTML `commentString` with the value returned by `replacer`. Comment will be deleted from markup if `null` is returned.
+`.cssCode(replacer)`|`replacer(cssCodeString)` | Replaces `cssCodeString` enclosed in `<style>` tag with the value returned by `replacer`.
+`.hyperlinks(replacer`)|`replacer(pageBaseUrl, hrefAttrValue)`| Replaces `<a>` tag `href` attribute value with the value returned by `replacer`. 
+`.images(replacer)`|`replacer(pageBaseUrl, srcAttrValue)` | Replaces `<img>` tag `src` attribute value with the value returned by `replacer`. 
+`.jsCode(replacer)`|`replacer(jsCodeString)` | Replaces `jsCodeString` enclosed in the `<script>` tag with the value returned by `replacer`.
+`.scripts(replacer)` | `replacer(pageBaseUrl, srcAttrValue)`| Replaces `<script>` tag `src` attribute value with the value returned by `replacer`. 
+`.stylesheets(replacer)`|`replacer(pageBaseUrl, hrefAttrValue)`| Replaces `<link rel="stylesheet">` tag `href` attribute value with the value returned by `replacer`. 
+`.texts(replacer)`| `replacer(text)`| Replaces `text` with the value returned by `replacer`. Returned value will be not HTML encoded by default, so HTML code can be used as `replacer` result. To force HTML encoding set `text.__encodeHtml` property to `true` in `replacer`.
+`.title(replacer)`|`replacer(title)` | Replaces page `title` with the value returned by `replacer`.
 
 ##Testing
 ```
