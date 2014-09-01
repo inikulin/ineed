@@ -160,18 +160,55 @@ exports['.title'] = function (t) {
 
 
 exports['Multiple plugins'] = function (t) {
-    var op = function (baseUrl, url) {
+    var replacer = function (baseUrl, url) {
             return url + '42';
         },
-        reprocessor = iwant.reprocess.images(op).scripts(op).stylesheets(op),
+        reprocessor = iwant.reprocess.images(replacer).scripts(replacer).stylesheets(replacer),
         expected = readFile('../data/reprocessed_multiple_plugins.html');
 
     var results = reprocessor.fromHtml(html);
     t.strictEqual(unifySpaces(results), unifySpaces(expected));
 
     //NOTE: check that duplicate plugins are ignored
-    reprocessor = reprocessor.images(op).scripts(op).stylesheets(op);
+    results = reprocessor.images(replacer).scripts(replacer).stylesheets(replacer).fromHtml(html);
     t.strictEqual(unifySpaces(results), unifySpaces(expected));
+
+    t.done();
+};
+
+exports['Delete content'] = function (t) {
+    var cleaningPlugin = {
+        name: 'cleanEverything',
+        extends: 'reprocess',
+
+        reset: function () {
+        },
+
+        onDoctype: function () {
+            return null;
+        },
+
+        onStartTag: function () {
+            return null;
+        },
+
+        onEndTag: function () {
+            return null;
+        },
+
+        onText: function () {
+            return null;
+        },
+
+        onComment: function () {
+            return null;
+        }
+
+    };
+
+    var result = iwant.using(cleaningPlugin).reprocess.cleanEverything().fromHtml(html);
+
+    t.strictEqual(result, emptyHtml);
 
     t.done();
 };
