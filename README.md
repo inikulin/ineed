@@ -180,7 +180,7 @@ var result = iwant.reprocess
         return null;
     })
     .texts(function(text) {
-        return text.replace(/:beer:/g, '<img src="emoji/unicode/1f37a.png" alt=":beer">');
+        return text.replace(/:beer:/g, '<img src="emoji/unicode/1f37a.png" alt=":beer:">');
     })
     .fromHtml(html);
 ```
