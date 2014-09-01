@@ -25,69 +25,59 @@ TestPipeline.prototype._aggregatePluginResults = function () {
 
 
 //Test plugins
-var EnvLoggerPlugin = (function () {
-        var results = null,
-            env = null,
-            prop = null;
+var EnvLoggerPlugin = {
+        name: 'envLogger',
 
-        return {
-            name: 'envLogger',
+        init: function (env, prop) {
+            this.env = env;
+            this.prop = prop;
+            this.results = [];
+        },
 
-            reset: function (environment, property) {
-                env = environment;
-                prop = property;
-                results = [];
-            },
+        onDoctype: function (doctype) {
+            this.results.push(doctype.name + ':' + this.env[this.prop]);
+        },
 
-            onDoctype: function (doctype) {
-                results.push(doctype.name + ':' + env[prop]);
-            },
+        onStartTag: function (startTag) {
+            this.results.push(startTag.tagName + ':' + this.env[this.prop]);
+        },
 
-            onStartTag: function (startTag) {
-                results.push(startTag.tagName + ':' + env[prop]);
-            },
+        onEndTag: function (tagName) {
+            this.results.push(tagName + ':' + this.env[this.prop]);
+        },
 
-            onEndTag: function (tagName) {
-                results.push(tagName + ':' + env[prop]);
-            },
+        onText: function (text) {
+            this.results.push(text + ':' + this.env[this.prop]);
+        },
 
-            onText: function (text) {
-                results.push(text + ':' + env[prop]);
-            },
+        onComment: function (comment) {
+            this.results.push(comment + ':' + this.env[this.prop]);
+        },
 
-            onComment: function (comment) {
-                results.push(comment + ':' + env[prop]);
-            },
+        getResult: function () {
+            return this.results;
+        }
+    },
 
-            getResult: function () {
-                return results;
-            }
-        };
-    })(),
+    FetchWebPageTestPlugin = {
+        name: 'fetchWebPageTest',
 
-    FetchWebPageTestPlugin = (function () {
-        var env = null,
-            pageText = null;
+        init: function (env) {
+            this.env = env;
+            this.pageText = null;
+        },
 
-        return {
-            name: 'fetchWebPageTest',
+        onText: function (text) {
+            this.pageText = text;
+        },
 
-            reset: function (environment) {
-                env = environment;
-            },
-
-            onText: function (text) {
-                pageText = text;
-            },
-
-            getResult: function () {
-                return {
-                    baseUrl: env.baseUrl,
-                    pageText: pageText
-                };
-            }
-        };
-    })();
+        getResult: function () {
+            return {
+                baseUrl: this.env.baseUrl,
+                pageText: this.pageText
+            };
+        }
+    };
 
 
 //Tests
@@ -95,120 +85,108 @@ exports['Plugin chain'] = function (t) {
     var pipeline = new TestPipeline(),
         src = '<!doctype html><html><head><title>42</title><!--hey--></head></html>',
         expected1 = [
-            'reset1', 'html', 'head', 'title', 'title', 'head', 'html'
+            'init1', 'html', 'head', 'title', 'title', 'head', 'html'
         ],
         expected2 = [
-            'reset2', 'html', 'html_op1mod', 'head_op1mod', 'title_op1mod',
+            'init2', 'html', 'html_op1mod', 'head_op1mod', 'title_op1mod',
             '42', 'hey'
         ],
         expected3 = [
-            'reset3', 'html_op2mod', 'html_op1mod', 'head_op1mod', 'title_op1mod',
+            'init3', 'html_op2mod', 'html_op1mod', 'head_op1mod', 'title_op1mod',
             '42_op2mod', 'title_op1mod', 'hey_op2mod', 'head_op1mod', 'html_op1mod'
         ],
 
-        plugin1 = (function () {
-            var results = [];
+        plugin1 = {
+            name: 'op1',
 
-            return {
-                name: 'op1',
+            init: function () {
+                this.results = ['init1'];
+            },
 
-                reset: function () {
-                    results.push('reset1');
-                },
+            onStartTag: function (startTag) {
+                this.results.push(startTag.tagName);
+                startTag.tagName += '_op1mod';
+                return startTag;
+            },
 
-                onStartTag: function (startTag) {
-                    results.push(startTag.tagName);
-                    startTag.tagName += '_op1mod';
-                    return startTag;
-                },
+            onEndTag: function (tagName) {
+                this.results.push(tagName);
+                tagName += '_op1mod';
 
-                onEndTag: function (tagName) {
-                    results.push(tagName);
-                    tagName += '_op1mod';
+                return tagName;
+            },
 
-                    return tagName;
-                },
+            getResult: function () {
+                return this.results;
+            }
+        },
 
-                getResult: function () {
-                    return results;
-                }
-            };
-        })(),
+        plugin2 = {
+            name: 'op2',
 
-        plugin2 = (function () {
-            var results = [];
+            init: function () {
+                this.results = ['init2'];
+            },
 
-            return {
-                name: 'op2',
+            onDoctype: function (doctype) {
+                this.results.push(doctype.name);
+                doctype.name += '_op2mod';
+                return doctype;
+            },
 
-                reset: function () {
-                    results.push('reset2');
-                },
+            onStartTag: function (startTag) {
+                this.results.push(startTag.tagName);
+            },
 
-                onDoctype: function (doctype) {
-                    results.push(doctype.name);
-                    doctype.name += '_op2mod';
-                    return doctype;
-                },
+            onText: function (text) {
+                this.results.push(text);
+                text += '_op2mod';
+                return text;
+            },
 
-                onStartTag: function (startTag) {
-                    results.push(startTag.tagName);
-                },
+            onComment: function (comment) {
+                this.results.push(comment);
+                comment += '_op2mod';
 
-                onText: function (text) {
-                    results.push(text);
-                    text += '_op2mod';
-                    return text;
-                },
+                return comment;
+            },
 
-                onComment: function (comment) {
-                    results.push(comment);
-                    comment += '_op2mod';
+            getResult: function () {
+                return this.results;
+            }
+        },
 
-                    return comment;
-                },
+        plugin3 = {
+            name: 'op3',
 
-                getResult: function () {
-                    return results;
-                }
-            };
-        })(),
+            init: function () {
+                this.results = ['init3'];
+            },
 
-        plugin3 = (function () {
-            var results = [];
+            onDoctype: function (doctype) {
+                this.results.push(doctype.name);
+            },
 
-            return {
-                name: 'op3',
+            onStartTag: function (startTag) {
+                this.results.push(startTag.tagName);
+            },
 
-                reset: function () {
-                    results.push('reset3');
-                },
+            onEndTag: function (tagName) {
+                this.results.push(tagName);
+            },
 
-                onDoctype: function (doctype) {
-                    results.push(doctype.name);
-                },
+            onText: function (text) {
+                this.results.push(text);
+            },
 
-                onStartTag: function (startTag) {
-                    results.push(startTag.tagName);
-                },
+            onComment: function (comment) {
+                this.results.push(comment);
+            },
 
-                onEndTag: function (tagName) {
-                    results.push(tagName);
-                },
-
-                onText: function (text) {
-                    results.push(text);
-                },
-
-                onComment: function (comment) {
-                    results.push(comment);
-                },
-
-                getResult: function () {
-                    return results;
-                }
-            };
-        })();
+            getResult: function () {
+                return this.results;
+            }
+        };
 
     pipeline.plugins.push(plugin1);
     pipeline.plugins.push(plugin2);
@@ -262,7 +240,7 @@ exports['EnvironmentPlugin - inBody'] = function (t) {
         ];
 
     pipeline.plugins.push(EnvLoggerPlugin);
-    pipeline.pluginResetArgs[EnvLoggerPlugin.name] = ['inBody'];
+    pipeline.pluginInitArgs[EnvLoggerPlugin.name] = ['inBody'];
 
     sources.forEach(function (src, i) {
         var result = pipeline.fromHtml(src);
@@ -283,7 +261,7 @@ exports['EnvironmentPlugin - leadingStartTag'] = function (t) {
         ];
 
     pipeline.plugins.push(EnvLoggerPlugin);
-    pipeline.pluginResetArgs[EnvLoggerPlugin.name] = ['leadingStartTag'];
+    pipeline.pluginInitArgs[EnvLoggerPlugin.name] = ['leadingStartTag'];
 
     var result = pipeline.fromHtml(src);
 
@@ -305,7 +283,7 @@ exports['EnvironmentPlugin - baseUrl'] = function (t) {
         ];
 
     pipeline.plugins.push(EnvLoggerPlugin);
-    pipeline.pluginResetArgs[EnvLoggerPlugin.name] = ['baseUrl'];
+    pipeline.pluginInitArgs[EnvLoggerPlugin.name] = ['baseUrl'];
 
     var result = pipeline.fromHtml(src);
     t.deepEqual(result['envLogger'], expected1);

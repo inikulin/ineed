@@ -17,10 +17,17 @@ function getCodeBlockErrMsg(block) {
     return msg;
 }
 
+function noop() {
+    //Do nothing =)
+}
+
 //Tests
 exports['Missing .name'] = function (t) {
     var err = getCodeBlockErrMsg(function () {
-        iwant.using({extends: 'reprocess'});
+        iwant.using({
+            extends: 'reprocess',
+            init: noop
+        });
     });
 
     t.strictEqual(err, ApiHost.ERR_PLUGIN_MISSING_NAME_PROPERTY);
@@ -30,7 +37,10 @@ exports['Missing .name'] = function (t) {
 
 exports['Missing .extends'] = function (t) {
     var err = getCodeBlockErrMsg(function () {
-        iwant.using({name: 'coolPlugin'});
+        iwant.using({
+            name: 'coolPlugin',
+            init: noop
+        });
     });
 
     t.strictEqual(err, ApiHost.ERR_PLUGIN_MISSING_EXTENDS_PROPERTY);
@@ -41,7 +51,8 @@ exports['Missing .getCollection()'] = function (t) {
     var err = getCodeBlockErrMsg(function () {
         iwant.using({
             name: 'coolPlugin',
-            extends: 'collect'
+            extends: 'collect',
+            init: noop
         });
     });
 
@@ -51,7 +62,8 @@ exports['Missing .getCollection()'] = function (t) {
         iwant.using({
             name: 'coolPlugin',
             extends: 'collect',
-            getCollection: 'test'
+            getCollection: 'test',
+            init: noop
         });
     });
 
@@ -60,7 +72,8 @@ exports['Missing .getCollection()'] = function (t) {
     err = getCodeBlockErrMsg(function () {
         iwant.using({
             name: 'coolPlugin',
-            extends: 'reprocess'
+            extends: 'reprocess',
+            init: noop
         });
     });
 
@@ -69,10 +82,37 @@ exports['Missing .getCollection()'] = function (t) {
     t.done();
 };
 
+exports['Missing .init()'] = function (t) {
+    var err = getCodeBlockErrMsg(function () {
+        iwant.using({
+            name: 'coolPlugin',
+            extends: 'collect',
+            getCollection: noop
+        });
+    });
+
+    t.strictEqual(err, ApiHost.ERR_PLUGIN_MISSING_INIT_METHOD);
+
+    err = getCodeBlockErrMsg(function () {
+        iwant.using({
+            name: 'coolPlugin',
+            extends: 'collect',
+            getCollection: noop,
+            init: 'test'
+        });
+    });
+
+    t.strictEqual(err, ApiHost.ERR_PLUGIN_MISSING_INIT_METHOD);
+
+    t.done();
+};
+
+
 exports['Duplicate name'] = function (t) {
     var collectPlugin = {
             name: 'collect_plugin',
             extends: 'collect',
+            init: noop,
             getCollection: function () {
                 return null;
             }
@@ -80,7 +120,8 @@ exports['Duplicate name'] = function (t) {
 
         reprocessPlugin = {
             name: 'reprocess_plugin',
-            extends: 'reprocess'
+            extends: 'reprocess',
+            init: noop
         };
 
     var err = getCodeBlockErrMsg(function () {
@@ -106,7 +147,8 @@ exports['Duplicate name'] = function (t) {
             .using(collectPlugin)
             .using({
                 name: 'collect_plugin',
-                extends: 'reprocess'
+                extends: 'reprocess',
+                init: noop
             })
     });
 
@@ -116,29 +158,25 @@ exports['Duplicate name'] = function (t) {
 };
 
 exports['Extend .collect()'] = function (t) {
-    var wordsPlugin = (function () {
-        var collection = null;
+    var wordsPlugin = {
+        name: 'words',
+        extends: 'collect',
 
-        return {
-            name: 'words',
-            extends: 'collect',
+        init: function () {
+            this.collection = [];
+        },
 
-            reset: function () {
-                collection = [];
-            },
+        onText: function (text) {
+            var words = text.split(' ').filter(function (word) {
+                return word.length;
+            });
+            this.collection = this.collection.concat(words);
+        },
 
-            onText: function (text) {
-                var words = text.split(' ').filter(function (word) {
-                    return word.length;
-                });
-                collection = collection.concat(words);
-            },
-
-            getCollection: function () {
-                return collection;
-            }
+        getCollection: function () {
+            return this.collection;
         }
-    })();
+    };
 
     var html = '<body><div>Yo dawg<span>i</span></div> heard you <span> like plugins </span></body>',
         expected = ['Yo', 'dawg', 'i', 'heard', 'you', 'like', 'plugins'],
@@ -150,24 +188,20 @@ exports['Extend .collect()'] = function (t) {
 };
 
 exports['Extend .reprocess()'] = function (t) {
-    var wordsPlugin = (function () {
-        var op = null;
+    var wordsPlugin = {
+        name: 'answer',
+        extends: 'reprocess',
 
-        return {
-            name: 'answer',
-            extends: 'reprocess',
+        init: function (env, replacer) {
+            this.replacer = replacer;
+        },
 
-            reset: function (env, operator) {
-                op = operator;
-            },
+        onText: function (text) {
+            text = text.replace(/42/g, this.replacer);
 
-            onText: function (text) {
-                text = text.replace(/42/g, op);
-
-                return text;
-            }
+            return text;
         }
-    })();
+    };
 
     var html = '<body><div>The<span>answer</span></div> is<span> 42</span></body>',
         expected = '<body><div>The<span>answer</span></div> is<span> 24</span></body>',

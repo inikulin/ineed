@@ -184,7 +184,7 @@ exports['Delete content'] = function (t) {
         name: 'cleanEverything',
         extends: 'reprocess',
 
-        reset: function () {
+        init: function () {
         },
 
         onDoctype: function () {
