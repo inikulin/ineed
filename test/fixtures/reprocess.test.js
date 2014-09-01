@@ -129,7 +129,10 @@ exports['.stylesheets'] = function (t) {
 };
 
 exports['.texts'] = function (t) {
-    var reprocessor = iwant.reprocess.texts(function (text) {
+    var reprocessor = iwant.reprocess.texts(function (text, encodeHtml) {
+            if (text === 'ullamco laboris')
+                return encodeHtml('<script>') + '&donotencodeme';
+
             return text.toUpperCase();
         }),
         expected = readFile('../data/reprocessed_texts.html');
