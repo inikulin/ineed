@@ -179,8 +179,8 @@ var result = iwant.reprocess
     .comments(function() {
         return null;
     })
-    .texts(function(text) {
-        return text.replace(/:beer:/g, '<img src="emoji/unicode/1f37a.png" alt=":beer:">');
+    .texts(function(text, escapeHtml) {
+        return escapeHtml(text).replace(/:beer:/g, '<img src="emoji/unicode/1f37a.png" alt=":beer:">');
     })
     .fromHtml(html);
 ```
@@ -196,7 +196,7 @@ Built-in plugins:
 `.jsCode(replacer)`|`replacer(jsCodeString)` | Replaces `jsCodeString` enclosed in the `<script>` tag with the value returned by `replacer`.
 `.scripts(replacer)` | `replacer(pageBaseUrl, srcAttrValue)`| Replaces `<script>` tag `src` attribute value with the value returned by `replacer`. 
 `.stylesheets(replacer)`|`replacer(pageBaseUrl, hrefAttrValue)`| Replaces `<link rel="stylesheet">` tag `href` attribute value with the value returned by `replacer`. 
-`.texts(replacer)`| `replacer(text, escapeHtmlFunc)`| Replaces `text` with the value returned by `replacer`. Returned value will be not HTML escaped, so HTML code can be used as `replacer` result. You can use `escapeHtmlFunc` for `replacer` result HTML escaping.
+`.texts(replacer)`| `replacer(text, escapeHtmlFunc)`| Replaces `text` with the value returned by `replacer`. Returned value will be not HTML escaped, so HTML code can be used as `replacer` result. You can manually apply `escapeHtmlFunc(str)` to force HTML escaping of the result.
 `.title(replacer)`|`replacer(title)` | Replaces page `title` with the value returned by `replacer`.
 
 ##Testing
