@@ -84,20 +84,24 @@ var ContextLoggerPlugin = {
 exports['Plugin chain'] = function (t) {
     var pipeline = new TestPipeline(),
         src = '<!doctype html><html><head><title>42</title><!--hey--></head></html>',
+
         expected1 = [
             'init1', 'html', 'head', 'title', 'title', 'head', 'html'
         ],
         expected2 = [
-            'init2', 'html', 'html_op1mod', 'head_op1mod', 'title_op1mod',
+            'init2', 'html', 'html_p1mod', 'head_p1mod', 'title_p1mod',
             '42', 'hey'
         ],
         expected3 = [
-            'init3', 'html_op2mod', 'html_op1mod', 'head_op1mod', 'title_op1mod',
-            '42_op2mod', 'title_op1mod', 'hey_op2mod', 'head_op1mod', 'html_op1mod'
+            'init3', 'html_p2mod', 'html_p1mod', 'head_p1mod', 'title_p1mod',
+            '42_p2mod', 'title_p1mod', 'hey_p2mod', 'head_p1mod', 'html_p1mod'
+        ],
+        expected4 = [
+            'init4'
         ],
 
         plugin1 = {
-            name: 'op1',
+            name: 'p1',
 
             init: function () {
                 this.results = ['init1'];
@@ -105,13 +109,13 @@ exports['Plugin chain'] = function (t) {
 
             onStartTag: function (startTag) {
                 this.results.push(startTag.tagName);
-                startTag.tagName += '_op1mod';
+                startTag.tagName += '_p1mod';
                 return startTag;
             },
 
             onEndTag: function (tagName) {
                 this.results.push(tagName);
-                tagName += '_op1mod';
+                tagName += '_p1mod';
 
                 return tagName;
             },
@@ -122,7 +126,7 @@ exports['Plugin chain'] = function (t) {
         },
 
         plugin2 = {
-            name: 'op2',
+            name: 'p2',
 
             init: function () {
                 this.results = ['init2'];
@@ -130,7 +134,7 @@ exports['Plugin chain'] = function (t) {
 
             onDoctype: function (doctype) {
                 this.results.push(doctype.name);
-                doctype.name += '_op2mod';
+                doctype.name += '_p2mod';
                 return doctype;
             },
 
@@ -140,13 +144,13 @@ exports['Plugin chain'] = function (t) {
 
             onText: function (text) {
                 this.results.push(text);
-                text += '_op2mod';
+                text += '_p2mod';
                 return text;
             },
 
             onComment: function (comment) {
                 this.results.push(comment);
-                comment += '_op2mod';
+                comment += '_p2mod';
 
                 return comment;
             },
@@ -157,10 +161,47 @@ exports['Plugin chain'] = function (t) {
         },
 
         plugin3 = {
-            name: 'op3',
+            name: 'p3',
 
             init: function () {
                 this.results = ['init3'];
+                return null;
+            },
+
+            onDoctype: function (doctype) {
+                this.results.push(doctype.name);
+                return null;
+            },
+
+            onStartTag: function (startTag) {
+                this.results.push(startTag.tagName);
+                return null;
+            },
+
+            onEndTag: function (tagName) {
+                this.results.push(tagName);
+                return null;
+            },
+
+            onText: function (text) {
+                this.results.push(text);
+                return null;
+            },
+
+            onComment: function (comment) {
+                this.results.push(comment);
+                return null;
+            },
+
+            getResult: function () {
+                return this.results;
+            }
+        },
+        plugin4 = {
+            name: 'p4',
+
+            init: function () {
+                this.results = ['init4'];
             },
 
             onDoctype: function (doctype) {
@@ -191,12 +232,14 @@ exports['Plugin chain'] = function (t) {
     pipeline.plugins.push(plugin1);
     pipeline.plugins.push(plugin2);
     pipeline.plugins.push(plugin3);
+    pipeline.plugins.push(plugin4);
 
     var result = pipeline.fromHtml(src);
 
-    t.deepEqual(result['op1'], expected1);
-    t.deepEqual(result['op2'], expected2);
-    t.deepEqual(result['op3'], expected3);
+    t.deepEqual(result['p1'], expected1);
+    t.deepEqual(result['p2'], expected2);
+    t.deepEqual(result['p3'], expected3);
+    t.deepEqual(result['p4'], expected4);
 
     t.done();
 };

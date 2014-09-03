@@ -31,7 +31,7 @@ exports['.comments'] = function (t) {
 exports['.cssCode'] = function (t) {
     var collector = ineed.collect.cssCode,
         expected = [
-            '.yo{background-color:red;}',
+            '.yo>dawg{background-color:red;}',
             '.hey{color:blue;font-size:42px;}'
         ];
 
@@ -92,7 +92,7 @@ exports['.images'] = function (t) {
 exports['.jsCode'] = function (t) {
     var collector = ineed.collect.jsCode,
         expected = [
-            'while(true){useJQuery();}',
+            'while(true&&a<b){useJQuery();}',
             'functionbuildBeautifulApps(){returncreateNgFactoryServiceProviderSingletonMock();}'
         ];
 
