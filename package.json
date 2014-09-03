@@ -1,5 +1,5 @@
 {
-  "name": "iwant",
+  "name": "ineed",
   "description": "Web scraping and HTML-reprocessing. The easy way.",
   "version": "1.0.0-pre.1",
   "author": "Ivan Nikulin <ifaaan@gmail.com> (https://github.com/inikulin)",
@@ -20,13 +20,13 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://raw.github.com/inikulin/iwant/master/LICENSE"
+      "url": "https://raw.github.com/inikulin/ineed/master/LICENSE"
     }
   ],
   "main": "./index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/inikulin/iwant.git"
+    "url": "git://github.com/inikulin/ineed.git"
   },
   "scripts": {
     "test": "node test/run_tests.js"

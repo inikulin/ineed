@@ -1,6 +1,6 @@
 var fs = require('fs'),
     path = require('path'),
-    iwant = require('../../index');
+    ineed = require('../../index');
 
 
 //Utils
@@ -19,7 +19,7 @@ var html = readFile('../data/src.html'),
 
 //Tests
 exports['.comments'] = function (t) {
-    var reprocessor = iwant.reprocess.comments(function (comment) {
+    var reprocessor = ineed.reprocess.comments(function (comment) {
             return 'Yo' + comment;
         }),
         expected = readFile('../data/reprocessed_comments.html');
@@ -35,7 +35,7 @@ exports['.comments'] = function (t) {
 
 
 exports['.cssCode'] = function (t) {
-    var reprocessor = iwant.reprocess.cssCode(function (cssCode) {
+    var reprocessor = ineed.reprocess.cssCode(function (cssCode) {
             return cssCode.replace('.', '#');
         }),
         expected = readFile('../data/reprocessed_css_code.html');
@@ -50,7 +50,7 @@ exports['.cssCode'] = function (t) {
 };
 
 exports['.hyperlinks'] = function (t) {
-    var reprocessor = iwant.reprocess.hyperlinks(function (baseUrl, href) {
+    var reprocessor = ineed.reprocess.hyperlinks(function (baseUrl, href) {
             t.ok(baseUrl);
             return href + '42';
         }),
@@ -66,7 +66,7 @@ exports['.hyperlinks'] = function (t) {
 };
 
 exports['.images'] = function (t) {
-    var reprocessor = iwant.reprocess.images(function (baseUrl, src) {
+    var reprocessor = ineed.reprocess.images(function (baseUrl, src) {
             t.ok(baseUrl);
             return src + '42';
         }),
@@ -82,7 +82,7 @@ exports['.images'] = function (t) {
 };
 
 exports['.jsCode'] = function (t) {
-    var reprocessor = iwant.reprocess.jsCode(function (code) {
+    var reprocessor = ineed.reprocess.jsCode(function (code) {
             return code.replace(/\(\)/g, '(yo)');
         }),
         expected = readFile('../data/reprocessed_js_code.html');
@@ -97,7 +97,7 @@ exports['.jsCode'] = function (t) {
 };
 
 exports['.scripts'] = function (t) {
-    var reprocessor = iwant.reprocess.scripts(function (baseUrl, src) {
+    var reprocessor = ineed.reprocess.scripts(function (baseUrl, src) {
             t.ok(baseUrl);
             return src + '42';
         }),
@@ -113,7 +113,7 @@ exports['.scripts'] = function (t) {
 };
 
 exports['.stylesheets'] = function (t) {
-    var reprocessor = iwant.reprocess.stylesheets(function (baseUrl, href) {
+    var reprocessor = ineed.reprocess.stylesheets(function (baseUrl, href) {
             t.ok(baseUrl);
             return href + '42';
         }),
@@ -129,7 +129,7 @@ exports['.stylesheets'] = function (t) {
 };
 
 exports['.texts'] = function (t) {
-    var reprocessor = iwant.reprocess.texts(function (text, encodeHtml) {
+    var reprocessor = ineed.reprocess.texts(function (text, encodeHtml) {
             if (text === 'ullamco laboris')
                 return encodeHtml('<script>') + '&donotencodeme';
 
@@ -147,7 +147,7 @@ exports['.texts'] = function (t) {
 };
 
 exports['.title'] = function (t) {
-    var reprocessor = iwant.reprocess.title(function (title) {
+    var reprocessor = ineed.reprocess.title(function (title) {
             return title.toUpperCase();
         }),
         expected = readFile('../data/reprocessed_title.html');
@@ -166,7 +166,7 @@ exports['Multiple plugins'] = function (t) {
     var replacer = function (baseUrl, url) {
             return url + '42';
         },
-        reprocessor = iwant.reprocess.images(replacer).scripts(replacer).stylesheets(replacer),
+        reprocessor = ineed.reprocess.images(replacer).scripts(replacer).stylesheets(replacer),
         expected = readFile('../data/reprocessed_multiple_plugins.html');
 
     var results = reprocessor.fromHtml(html);
@@ -209,7 +209,7 @@ exports['Delete content'] = function (t) {
 
     };
 
-    var result = iwant.using(cleaningPlugin).reprocess.cleanEverything().fromHtml(html);
+    var result = ineed.using(cleaningPlugin).reprocess.cleanEverything().fromHtml(html);
 
     t.strictEqual(result, emptyHtml);
 

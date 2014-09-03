@@ -1,6 +1,6 @@
 var fs = require('fs'),
     path = require('path'),
-    iwant = require('../../index');
+    ineed = require('../../index');
 
 
 //Test data
@@ -16,7 +16,7 @@ function removeSpaces(str) {
 
 //Tests
 exports['.comments'] = function (t) {
-    var collector = iwant.collect.comments,
+    var collector = ineed.collect.comments,
         expected = ['Comment1', 'Comment3', 'Comment2'];
 
     var results = collector.fromHtml(html);
@@ -29,7 +29,7 @@ exports['.comments'] = function (t) {
 };
 
 exports['.cssCode'] = function (t) {
-    var collector = iwant.collect.cssCode,
+    var collector = ineed.collect.cssCode,
         expected = [
             '.yo{background-color:red;}',
             '.hey{color:blue;font-size:42px;}'
@@ -46,7 +46,7 @@ exports['.cssCode'] = function (t) {
 };
 
 exports['.hyperlinks'] = function (t) {
-    var collector = iwant.collect.hyperlinks,
+    var collector = ineed.collect.hyperlinks,
         expected = [
             {
                 href: 'http://www.yo.dawg/come/get/some',
@@ -68,7 +68,7 @@ exports['.hyperlinks'] = function (t) {
 };
 
 exports['.images'] = function (t) {
-    var collector = iwant.collect.images,
+    var collector = ineed.collect.images,
         expected = [
             {
                 src: 'http://www.test.test/puppy/images/kitty.jpg',
@@ -90,7 +90,7 @@ exports['.images'] = function (t) {
 };
 
 exports['.jsCode'] = function (t) {
-    var collector = iwant.collect.jsCode,
+    var collector = ineed.collect.jsCode,
         expected = [
             'while(true){useJQuery();}',
             'functionbuildBeautifulApps(){returncreateNgFactoryServiceProviderSingletonMock();}'
@@ -107,7 +107,7 @@ exports['.jsCode'] = function (t) {
 };
 
 exports['.scripts'] = function (t) {
-    var collector = iwant.collect.scripts,
+    var collector = ineed.collect.scripts,
         expected = [
             'http://www.yo.dawg/scripts/awesomelib.js',
             'http://www.yo.dawg/iheard/scripts/coollib.js'
@@ -123,7 +123,7 @@ exports['.scripts'] = function (t) {
 };
 
 exports['.stylesheets'] = function (t) {
-    var collector = iwant.collect.stylesheets,
+    var collector = ineed.collect.stylesheets,
         expected = [
             'http://www.yo.dawg/css/beauty.css',
             'http://www.test.test/css/beauty.css'
@@ -139,7 +139,7 @@ exports['.stylesheets'] = function (t) {
 };
 
 exports['.texts'] = function (t) {
-    var collector = iwant.collect.texts,
+    var collector = ineed.collect.texts,
         expected = [
             'Yo!',
             'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ' +
@@ -165,7 +165,7 @@ exports['.texts'] = function (t) {
 };
 
 exports['.title'] = function (t) {
-    var collector = iwant.collect.title,
+    var collector = ineed.collect.title,
         expected = 'Yo!';
 
     var results = collector.fromHtml(html);
@@ -178,13 +178,13 @@ exports['.title'] = function (t) {
 };
 
 exports['Multiple plugins'] = function (t) {
-    var collector = iwant.collect.images.scripts.stylesheets,
+    var collector = ineed.collect.images.scripts.stylesheets,
         result = collector.fromHtml(html);
 
     //NOTE: check that chaining doesn't affect individual results
-    t.deepEqual(result.images, iwant.collect.images.fromHtml(html).images);
-    t.deepEqual(result.scripts, iwant.collect.scripts.fromHtml(html).scripts);
-    t.deepEqual(result.stylesheets, iwant.collect.stylesheets.fromHtml(html).stylesheets);
+    t.deepEqual(result.images, ineed.collect.images.fromHtml(html).images);
+    t.deepEqual(result.scripts, ineed.collect.scripts.fromHtml(html).scripts);
+    t.deepEqual(result.stylesheets, ineed.collect.stylesheets.fromHtml(html).stylesheets);
 
     //NOTE: check that duplicate plugins are ignored
     collector = collector.images.scripts.stylesheets;

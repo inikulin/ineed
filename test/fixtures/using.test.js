@@ -1,5 +1,5 @@
 var util = require('util'),
-    iwant = require('../../index'),
+    ineed = require('../../index'),
     ApiHost = require('../../lib/api_host');
 
 //Utils
@@ -24,7 +24,7 @@ function noop() {
 //Tests
 exports['Missing .name'] = function (t) {
     var err = getCodeBlockErrMsg(function () {
-        iwant.using({
+        ineed.using({
             extends: 'reprocess',
             init: noop
         });
@@ -37,7 +37,7 @@ exports['Missing .name'] = function (t) {
 
 exports['Missing .extends'] = function (t) {
     var err = getCodeBlockErrMsg(function () {
-        iwant.using({
+        ineed.using({
             name: 'coolPlugin',
             init: noop
         });
@@ -49,7 +49,7 @@ exports['Missing .extends'] = function (t) {
 
 exports['Missing .getCollection()'] = function (t) {
     var err = getCodeBlockErrMsg(function () {
-        iwant.using({
+        ineed.using({
             name: 'coolPlugin',
             extends: 'collect',
             init: noop
@@ -59,7 +59,7 @@ exports['Missing .getCollection()'] = function (t) {
     t.strictEqual(err, ApiHost.ERR_PLUGIN_MISSING_GET_COLLECTION_METHOD);
 
     err = getCodeBlockErrMsg(function () {
-        iwant.using({
+        ineed.using({
             name: 'coolPlugin',
             extends: 'collect',
             getCollection: 'test',
@@ -70,7 +70,7 @@ exports['Missing .getCollection()'] = function (t) {
     t.strictEqual(err, ApiHost.ERR_PLUGIN_MISSING_GET_COLLECTION_METHOD);
 
     err = getCodeBlockErrMsg(function () {
-        iwant.using({
+        ineed.using({
             name: 'coolPlugin',
             extends: 'reprocess',
             init: noop
@@ -84,7 +84,7 @@ exports['Missing .getCollection()'] = function (t) {
 
 exports['Missing .init()'] = function (t) {
     var err = getCodeBlockErrMsg(function () {
-        iwant.using({
+        ineed.using({
             name: 'coolPlugin',
             extends: 'collect',
             getCollection: noop
@@ -94,7 +94,7 @@ exports['Missing .init()'] = function (t) {
     t.strictEqual(err, ApiHost.ERR_PLUGIN_MISSING_INIT_METHOD);
 
     err = getCodeBlockErrMsg(function () {
-        iwant.using({
+        ineed.using({
             name: 'coolPlugin',
             extends: 'collect',
             getCollection: noop,
@@ -125,7 +125,7 @@ exports['Duplicate name'] = function (t) {
         };
 
     var err = getCodeBlockErrMsg(function () {
-        iwant
+        ineed
             .using(collectPlugin)
             .using(reprocessPlugin)
             .using(collectPlugin);
@@ -134,7 +134,7 @@ exports['Duplicate name'] = function (t) {
     t.strictEqual(err, util.format(ApiHost.ERR_DUPLICATE_PLUGIN_NAME, 'collect_plugin', 'collect'));
 
     err = getCodeBlockErrMsg(function () {
-        iwant
+        ineed
             .using(collectPlugin)
             .using(reprocessPlugin)
             .using(reprocessPlugin);
@@ -143,7 +143,7 @@ exports['Duplicate name'] = function (t) {
     t.strictEqual(err, util.format(ApiHost.ERR_DUPLICATE_PLUGIN_NAME, 'reprocess_plugin', 'reprocess'));
 
     err = getCodeBlockErrMsg(function () {
-        iwant
+        ineed
             .using(collectPlugin)
             .using({
                 name: 'collect_plugin',
@@ -180,7 +180,7 @@ exports['Extend .collect()'] = function (t) {
 
     var html = '<body><div>Yo dawg<span>i</span></div> heard you <span> like plugins </span></body>',
         expected = ['Yo', 'dawg', 'i', 'heard', 'you', 'like', 'plugins'],
-        result = iwant.using(wordsPlugin).collect.words.fromHtml(html);
+        result = ineed.using(wordsPlugin).collect.words.fromHtml(html);
 
     t.deepEqual(result.words, expected);
 
@@ -205,7 +205,7 @@ exports['Extend .reprocess()'] = function (t) {
 
     var html = '<body><div>The<span>answer</span></div> is<span> 42</span></body>',
         expected = '<body><div>The<span>answer</span></div> is<span> 24</span></body>',
-        result = iwant.using(wordsPlugin).reprocess.answer(function () {
+        result = ineed.using(wordsPlugin).reprocess.answer(function () {
             return '24';
         }).fromHtml(html);
 
