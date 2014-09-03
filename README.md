@@ -187,7 +187,7 @@ var result = iwant.reprocess
 
 Built-in plugins:
 
-| Plugin        | `replacer` signature | Description |
+| Plugin        | `replacer` arguments | Description |
 --- | --- | ---
 `.comments(replacer)`|`replacer(commentString)` | Replaces HTML `commentString` with the value returned by `replacer`. Comment will be deleted from markup if `null` is returned.
 `.cssCode(replacer)`|`replacer(cssCodeString)` | Replaces `cssCodeString` enclosed in `<style>` tag with the value returned by `replacer`.
