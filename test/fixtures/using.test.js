@@ -192,7 +192,7 @@ exports['Extend .reprocess()'] = function (t) {
         name: 'answer',
         extends: 'reprocess',
 
-        init: function (env, replacer) {
+        init: function (ctx, replacer) {
             this.replacer = replacer;
         },
 

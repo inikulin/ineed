@@ -25,33 +25,33 @@ TestPipeline.prototype._aggregatePluginResults = function () {
 
 
 //Test plugins
-var EnvLoggerPlugin = {
-        name: 'envLogger',
+var ContextLoggerPlugin = {
+        name: 'ctxLogger',
 
-        init: function (env, prop) {
-            this.env = env;
+        init: function (ctx, prop) {
+            this.ctx = ctx;
             this.prop = prop;
             this.results = [];
         },
 
         onDoctype: function (doctype) {
-            this.results.push(doctype.name + ':' + this.env[this.prop]);
+            this.results.push(doctype.name + ':' + this.ctx[this.prop]);
         },
 
         onStartTag: function (startTag) {
-            this.results.push(startTag.tagName + ':' + this.env[this.prop]);
+            this.results.push(startTag.tagName + ':' + this.ctx[this.prop]);
         },
 
         onEndTag: function (tagName) {
-            this.results.push(tagName + ':' + this.env[this.prop]);
+            this.results.push(tagName + ':' + this.ctx[this.prop]);
         },
 
         onText: function (text) {
-            this.results.push(text + ':' + this.env[this.prop]);
+            this.results.push(text + ':' + this.ctx[this.prop]);
         },
 
         onComment: function (comment) {
-            this.results.push(comment + ':' + this.env[this.prop]);
+            this.results.push(comment + ':' + this.ctx[this.prop]);
         },
 
         getResult: function () {
@@ -62,8 +62,8 @@ var EnvLoggerPlugin = {
     FetchWebPageTestPlugin = {
         name: 'fetchWebPageTest',
 
-        init: function (env) {
-            this.env = env;
+        init: function (ctx) {
+            this.ctx = ctx;
             this.pageText = null;
         },
 
@@ -73,7 +73,7 @@ var EnvLoggerPlugin = {
 
         getResult: function () {
             return {
-                baseUrl: this.env.baseUrl,
+                baseUrl: this.ctx.baseUrl,
                 pageText: this.pageText
             };
         }
@@ -201,7 +201,7 @@ exports['Plugin chain'] = function (t) {
     t.done();
 };
 
-exports['EnvironmentPlugin - inBody'] = function (t) {
+exports['ContextPlugin - inBody'] = function (t) {
     var pipeline = new TestPipeline(),
         sources = [
             '<!doctype html><html><head><title>Test</title><script>var a = 3;</script></head>Yo!</html>',
@@ -239,19 +239,19 @@ exports['EnvironmentPlugin - inBody'] = function (t) {
             ]
         ];
 
-    pipeline.plugins.push(EnvLoggerPlugin);
-    pipeline.pluginInitArgs[EnvLoggerPlugin.name] = ['inBody'];
+    pipeline.plugins.push(ContextLoggerPlugin);
+    pipeline.pluginInitArgs[ContextLoggerPlugin.name] = ['inBody'];
 
     sources.forEach(function (src, i) {
         var result = pipeline.fromHtml(src);
 
-        t.deepEqual(result['envLogger'], expected[i]);
+        t.deepEqual(result['ctxLogger'], expected[i]);
     });
 
     t.done();
 };
 
-exports['EnvironmentPlugin - leadingStartTag'] = function (t) {
+exports['ContextPlugin - leadingStartTag'] = function (t) {
     var pipeline = new TestPipeline(),
         src = '<!doctype html><html><head><title></title><meta/></head><body><!--42--><script>42</script>Test</html>',
         expected = [
@@ -260,17 +260,17 @@ exports['EnvironmentPlugin - leadingStartTag'] = function (t) {
             '42:script', 'script:null', 'Test:null', 'html:null'
         ];
 
-    pipeline.plugins.push(EnvLoggerPlugin);
-    pipeline.pluginInitArgs[EnvLoggerPlugin.name] = ['leadingStartTag'];
+    pipeline.plugins.push(ContextLoggerPlugin);
+    pipeline.pluginInitArgs[ContextLoggerPlugin.name] = ['leadingStartTag'];
 
     var result = pipeline.fromHtml(src);
 
-    t.deepEqual(result['envLogger'], expected);
+    t.deepEqual(result['ctxLogger'], expected);
 
     t.done();
 };
 
-exports['EnvironmentPlugin - baseUrl'] = function (t) {
+exports['ContextPlugin - baseUrl'] = function (t) {
     var pipeline = new TestPipeline(),
         src = '<!doctype html><html><head><base href="/test/path"></head></html>',
         expected1 = [
@@ -282,14 +282,14 @@ exports['EnvironmentPlugin - baseUrl'] = function (t) {
             'html:http://www.test.test/test/path'
         ];
 
-    pipeline.plugins.push(EnvLoggerPlugin);
-    pipeline.pluginInitArgs[EnvLoggerPlugin.name] = ['baseUrl'];
+    pipeline.plugins.push(ContextLoggerPlugin);
+    pipeline.pluginInitArgs[ContextLoggerPlugin.name] = ['baseUrl'];
 
     var result = pipeline.fromHtml(src);
-    t.deepEqual(result['envLogger'], expected1);
+    t.deepEqual(result['ctxLogger'], expected1);
 
     result = pipeline.fromHtml(src, 'http://www.test.test');
-    t.deepEqual(result['envLogger'], expected2);
+    t.deepEqual(result['ctxLogger'], expected2);
 
     t.done();
 };
