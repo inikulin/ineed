@@ -95,7 +95,7 @@ And the `resultHtml` will be:
 ```
 
 
-`ineed` doesn't build and traverse DOM-tree, it operates on sequence of HTML-tokens instead. Whole processing is done in  [one-pass](http://en.wikipedia.org/wiki/One-pass_algorithm), therefore, **it's blazing fast**!
+`ineed` doesn't build and traverse DOM-tree, it operates on sequence of HTML tokens instead. Whole processing is done in  [one-pass](http://en.wikipedia.org/wiki/One-pass_algorithm), therefore, **it's blazing fast**!
 
 
 `ineed` provides built-in collectors and reprocessors that covers a wide variety of common use cases. However, if you feel that something is missing, then you can easily extend it with custom plugins.
@@ -111,6 +111,7 @@ The general form:
 ####```ineed.<action>[.<plugin>...].<from*>```
 
 ---------------------------------------
+
 ###from* methods
 #####.fromHtml(html)
 Accepts `html` string as an argument and synchronously returns `result` of the action.
@@ -142,6 +143,8 @@ ineed.collect.title.from({
 
 ```
 
+---------------------------------------
+
 ###.collect action
 Collects information specified by plugin set. The `result` of the action is an object that contains individual plugin outputs as properties.
 
@@ -172,6 +175,8 @@ Built-in plugins:
 `.title`| Collects document title | Document title string
 
 *Remark:* All URLs are collected in respect to `<base>` tag. The resulting URL will be an absolute URL if `.from()` method was used, `<base>` tag constains absolute URL or raw collected URL is already absolute.
+
+---------------------------------------
 
 ###.reprocess action
 Applies plugins' replacing functions to the source HTML-string. The `result` of the action is the reprocessed HTML-string.
