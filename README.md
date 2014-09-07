@@ -209,7 +209,8 @@ Built-in plugins:
 `.title(replacer)`|`replacer(title)` | Replaces page `title` with the value returned by `replacer`.
 
 ##Custom plugins
-Custom plugins can extend `.collect` or `.reprocess` actions. To enable plugin use `.using()` function, which will return new instance of `ineed` with enabled plugin.
+There are two kinds of plugins: those that extends `.collect` action and those that extends `.reprocess` action. To enable plugin use `.using()` function, which will return new instance of `ineed` with enabled plugin.
+
 *Example:*
 ```js
 ineed
@@ -219,15 +220,14 @@ ineed
     ...
 ```
 
-There are two kinds of plugins: those that extends `.collect` action and those that extends `.reprocess` action.
+###Common structure
 
-###Common plugin structure
 Plugins of both kinds are objects and in addition to kind-specific properties they should have the following properties:
 ####.extends
 Indicates which action will be extended by plugin. Can be `'collect'` or `'reprocess'`. Required field.
 
 #### .name
-Unique name of the plugin. Required property. It should reflect the target of the plugin action. This field will extend `.collect` or `.reprocess` objects and will be used as result property name for `.collect` action. E.g. `plugin` has `name='tagNames'`. If it extends `.collect`:
+Name of the plugin. Required property. It should reflect the target of the plugin action. This field will extend `.collect` or `.reprocess` objects and will be used as result property name for `.collect` action. E.g. `plugin` has `name='tagNames'`. If it extends `.collect`:
 ```js
 //Enable plugin and use it
 var result = ineed.using(plugin).collect.tagNames.fromHtml(html);
@@ -246,6 +246,84 @@ If it extends `.reprocess`:
                 return 'object';
         })
         .fromHtml(html);
+```
+
+#### .init(ctx, ...)
+Function that initializes plugin. Required field. It always receives `ctx` object as it first argument. `ctx` contains
+some useful common information regarding current pipeline state:
+#####ctx.baseUrl 
+Base URL of all resources on the page with respect to `<base>` tag.
+
+#####ctx.leadingStartTag
+Leading non-self-closing start tag for the current HTML token. Can be used to determine parent of the text nodes. Will be `null` if the leading start tag was self-closing or any leading end tag was met.
+
+#####ctx.inBody
+Indicates if emitted tokens are in `<body>` tag. 
+
+####Token handlers
+Plugin can have one or more HTML token handlers:
+*  `.onDoctype(doctype)`
+ 
+Where `doctype`:
+```js
+{
+    name: [String],
+    publicId: [String],
+    systemId: [String]
+}
+```
+
+*  `.onStartTag(startTag)`
+ 
+Where `startTag`: 
+```js
+{
+    tagName: [String],
+    attrs: [Array],
+    selfClosing: [Boolean]
+}
+```
+*  `.onEndTag(tagName)`
+*  `.onText(text)`
+*  `.onComment(commentText)`
+
+
+###Collecting plugins
+Collecting plugins in addition to common properties should have `.getCollection()` method that should return items collected by plugin.
+
+*Example of the collecting plugin:*
+```js
+//Collects tagNames in <body>
+var plugin = {
+    extends: 'collect',
+    name: 'tagNamesInBody',
+
+    init: function (ctx) {
+        this.ctx = ctx;
+        this.tagNames = [];
+    },
+
+    addTagName: function (tagName) {
+        if (this.ctx.inBody && this.tagNames.indexOf(tagName) < 0)
+            this.tagNames.push(tagName);
+    },
+
+    onStartTag: function (startTag) {
+        this.addTagName(startTag.tagName);
+    },
+
+    onEndTag: function (tagName) {
+        this.addTagName(tagName);
+    },
+
+    getCollection: function () {
+        return this.tagNames;
+    }
+};
+
+//Let's use it
+var results = ineed.using(plugin).collect.tagNamesInBody.fromHtml(html);
+console.log(results.tagNamesInBody);
 ```
 
 
