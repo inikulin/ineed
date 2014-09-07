@@ -208,6 +208,39 @@ Built-in plugins:
 `.texts(replacer)`| `replacer(text, escapeHtmlFunc)`| Replaces `text` with the value returned by `replacer`. Returned value will be not HTML escaped, so HTML code can be used as `replacer` result. You can manually apply `escapeHtmlFunc(str)` to force HTML escaping of the result.
 `.title(replacer)`|`replacer(title)` | Replaces page `title` with the value returned by `replacer`.
 
+##Custom plugins
+Custom plugins can extend `.collect` or `.reprocess` actions. To enable plugin use `.using()` function, which will return new instance of `ineed` with enabled plugin.
+*Example:*
+```js
+ineed
+    .using(myPlugin1)
+    .using(myPlugin2)
+    .collect
+    ...
+```
+
+In general plugins are objects with the following properties:
+*  `name` - unique name of the plugin. Required property. It should reflect the target of the plugin action. This field will extend `.collect` or `.reprocess` objects and will be used as result property name for `.collect` action. E.g. `plugin` has `name='tagNames'`. If it extends `.collect`:
+```js
+//Enable plugin and use it
+var result = ineed.using(plugin).collect.tagNames.fromHtml(html);
+
+//Access plugin results
+var pluginResults = result.tagNames;
+```
+
+If it extends `.reprocess`:
+```js
+ var reprocessedHtml = ineed
+        .using(plugin)
+        .reprocess
+        .startTags(function (tagName) {
+            if (tagName === 'applet')
+                return 'object';
+        })
+        .fromHtml(html);
+```
+
 ##Testing
 ```
 $ npm test
