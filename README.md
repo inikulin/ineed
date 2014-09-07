@@ -326,6 +326,53 @@ var results = ineed.using(plugin).collect.tagNamesInBody.fromHtml(html);
 console.log(results.tagNamesInBody);
 ```
 
+###Reprocessing plugins
+Reprocessing plugin's `init` method receives `replacer()` function as it's second argument. If token handler returns `null` then token will be deleted from the pipeline and no farther processing by other plugins will be performed on it and it will not appear in the resulting HTML. If handler returns modified token then it will be passed to the farther plugins and will appear in the resulting HTML. If handler doesn't returns value or returns `undefined` then no token will be passed unmodified to the farther plugins.
+
+*Example of the reprocessing plugin:*
+```js
+//Replaces or deletes tagNames in <body>
+var plugin = {
+    extends: 'replace',
+    name: 'tagNamesInBody',
+
+    init: function (ctx, replace) {
+        this.ctx = ctx;
+        this.replacer = replacer;
+    },
+
+    onStartTag: function (startTag) {
+        if (this.ctx.inBody) {
+            startTag.tagName = this.replacer(startTag.tagName);
+
+            //Delete token if tagName is null
+            return startTag.tagName === null ? null : startTag;
+        }
+    },
+
+    onEndTag: function (tagName) {
+        if (this.ctx.inBody)
+            return this.replacer(tagName);
+    }
+};
+
+//Let's use it
+var reprocessedHtml = ineed
+    .using(plugin)
+    .reprocess
+    .tagNamesInBody(function (tagName) {
+        //Delete <noscript> start and end tags
+        if (tagName === 'noscript')
+            return null;
+        
+        //Replace <div> with <p>
+        if(tagName === 'div')
+            return 'p';
+            
+        return tagName;
+    }).fromHtml(html);
+
+```
 
 ##Testing
 ```
