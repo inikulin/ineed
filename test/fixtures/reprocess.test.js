@@ -4,12 +4,12 @@ var fs = require('fs'),
 
 
 //Utils
-function readFile(filePath) {
-    return fs.readFileSync(path.join(__dirname, filePath)).toString();
-}
-
 function unifySpaces(str) {
     return str.replace(/\s+/g, ' ');
+}
+
+function readFile(filePath) {
+    return unifySpaces(fs.readFileSync(path.join(__dirname, filePath)).toString());
 }
 
 //Test data
@@ -18,200 +18,164 @@ var html = readFile('../data/src.html'),
 
 
 //Tests
-exports['.comments'] = function (t) {
-    var reprocessor = ineed.reprocess.comments(function (comment) {
-            return 'Yo' + comment;
-        }),
-        expected = readFile('../data/reprocessed_comments.html');
+describe('.reprocess', function () {
 
-    var results = reprocessor.fromHtml(html);
-    t.strictEqual(unifySpaces(results), unifySpaces(expected));
+    it('.comments(): should replace comments', function () {
+        var reprocessor = ineed.reprocess.comments(function (comment) {
+                return 'Yo' + comment;
+            }),
+            expected = readFile('../data/reprocessed_comments.html');
 
-    results = reprocessor.fromHtml(emptyHtml);
-    t.strictEqual(results, emptyHtml);
+        unifySpaces(reprocessor.fromHtml(html)).should.be.eql(expected);
+        reprocessor.fromHtml(emptyHtml).should.eql(emptyHtml);
+    });
 
-    t.done();
-};
+    it('.cssCode(): should replace CSS code in <style> tags', function () {
+        var reprocessor = ineed.reprocess.cssCode(function (cssCode) {
+                return cssCode.replace('.', '#');
+            }),
+            expected = readFile('../data/reprocessed_css_code.html');
 
+        unifySpaces(reprocessor.fromHtml(html)).should.be.eql(expected);
+        reprocessor.fromHtml(emptyHtml).should.eql(emptyHtml);
+    });
 
-exports['.cssCode'] = function (t) {
-    var reprocessor = ineed.reprocess.cssCode(function (cssCode) {
-            return cssCode.replace('.', '#');
-        }),
-        expected = readFile('../data/reprocessed_css_code.html');
+    it('.hyperlinks(): should replace "href" attribute of the hyperlinks', function () {
+        var reprocessor = ineed.reprocess.hyperlinks(function (baseUrl, href) {
+                baseUrl.should.be.ok;
+                return href + '42';
+            }),
+            expected = readFile('../data/reprocessed_hyperlinks.html');
 
-    var results = reprocessor.fromHtml(html);
-    t.strictEqual(unifySpaces(results), unifySpaces(expected));
+        unifySpaces(reprocessor.fromHtml(html)).should.be.eql(expected);
+        reprocessor.fromHtml(emptyHtml).should.eql(emptyHtml);
+    });
 
-    results = reprocessor.fromHtml(emptyHtml);
-    t.strictEqual(results, emptyHtml);
+    it('.images(): should replace "src" attribute of the images', function () {
+        var reprocessor = ineed.reprocess.images(function (baseUrl, src) {
+                baseUrl.should.be.ok;
+                return src + '42';
+            }),
+            expected = readFile('../data/reprocessed_images.html');
 
-    t.done();
-};
+        unifySpaces(reprocessor.fromHtml(html)).should.be.eql(expected);
+        reprocessor.fromHtml(emptyHtml).should.eql(emptyHtml);
+    });
 
-exports['.hyperlinks'] = function (t) {
-    var reprocessor = ineed.reprocess.hyperlinks(function (baseUrl, href) {
-            t.ok(baseUrl);
-            return href + '42';
-        }),
-        expected = readFile('../data/reprocessed_hyperlinks.html');
+    it('.jsCode(): should replace JavaScript in <script> tags', function () {
+        var reprocessor = ineed.reprocess.jsCode(function (code) {
+                return code.replace(/\(\)/g, '(yo)');
+            }),
+            expected = readFile('../data/reprocessed_js_code.html');
 
-    var results = reprocessor.fromHtml(html);
-    t.strictEqual(unifySpaces(results), unifySpaces(expected));
+        unifySpaces(reprocessor.fromHtml(html)).should.be.eql(expected);
+        reprocessor.fromHtml(emptyHtml).should.eql(emptyHtml);
+    });
 
-    results = reprocessor.fromHtml(emptyHtml);
-    t.strictEqual(results, emptyHtml);
+    it('.scripts(): should replace "src" attribute of the scripts', function () {
+        var reprocessor = ineed.reprocess.scripts(function (baseUrl, src) {
+                baseUrl.should.be.ok;
+                return src + '42';
+            }),
+            expected = readFile('../data/reprocessed_scripts.html');
 
-    t.done();
-};
+        unifySpaces(reprocessor.fromHtml(html)).should.be.eql(expected);
+        reprocessor.fromHtml(emptyHtml).should.eql(emptyHtml);
+    });
 
-exports['.images'] = function (t) {
-    var reprocessor = ineed.reprocess.images(function (baseUrl, src) {
-            t.ok(baseUrl);
-            return src + '42';
-        }),
-        expected = readFile('../data/reprocessed_images.html');
+    it('.stylesheets(): should replace <link>\'s "href" attribute', function () {
+        var reprocessor = ineed.reprocess.stylesheets(function (baseUrl, href) {
+                baseUrl.should.be.ok;
+                return href + '42';
+            }),
+            expected = readFile('../data/reprocessed_stylesheets.html');
 
-    var results = reprocessor.fromHtml(html);
-    t.strictEqual(unifySpaces(results), unifySpaces(expected));
+        unifySpaces(reprocessor.fromHtml(html)).should.be.eql(expected);
+        reprocessor.fromHtml(emptyHtml).should.eql(emptyHtml);
+    });
 
-    results = reprocessor.fromHtml(emptyHtml);
-    t.strictEqual(results, emptyHtml);
+    it('.texts(): should replace texts and provide encodeHtml() method', function () {
+        var reprocessor = ineed.reprocess.texts(function (text, encodeHtml) {
+                if (text === 'ullamco laboris')
+                    return encodeHtml('<script>') + '&donotencodeme';
 
-    t.done();
-};
+                return text.toUpperCase();
+            }),
+            expected = readFile('../data/reprocessed_texts.html');
 
-exports['.jsCode'] = function (t) {
-    var reprocessor = ineed.reprocess.jsCode(function (code) {
-            return code.replace(/\(\)/g, '(yo)');
-        }),
-        expected = readFile('../data/reprocessed_js_code.html');
+        unifySpaces(reprocessor.fromHtml(html)).should.be.eql(expected);
+        reprocessor.fromHtml(emptyHtml).should.eql(emptyHtml);
+    });
 
-    var results = reprocessor.fromHtml(html);
-    t.strictEqual(unifySpaces(results), unifySpaces(expected));
+    it('.title(): should replace page title', function () {
+        var reprocessor = ineed.reprocess.title(function (title) {
+                return title.toUpperCase();
+            }),
+            expected = readFile('../data/reprocessed_title.html');
 
-    results = reprocessor.fromHtml(emptyHtml);
-    t.strictEqual(results, emptyHtml);
+        unifySpaces(reprocessor.fromHtml(html)).should.be.eql(expected);
+        reprocessor.fromHtml(emptyHtml).should.eql(emptyHtml);
+    });
 
-    t.done();
-};
+    it('should support plugin chaining and ignore duplicate plugins', function () {
+        var replacer = function (baseUrl, url) {
+                return url + '42';
+            },
+            reprocessor = ineed.reprocess
+                .images(replacer)
+                .scripts(replacer)
+                .stylesheets(replacer),
+            expected = readFile('../data/reprocessed_multiple_plugins.html');
 
-exports['.scripts'] = function (t) {
-    var reprocessor = ineed.reprocess.scripts(function (baseUrl, src) {
-            t.ok(baseUrl);
-            return src + '42';
-        }),
-        expected = readFile('../data/reprocessed_scripts.html');
+        unifySpaces(reprocessor.fromHtml(html)).should.eql(expected);
 
-    var results = reprocessor.fromHtml(html);
-    t.strictEqual(unifySpaces(results), unifySpaces(expected));
+        //NOTE: check that duplicate plugins are ignored
+        unifySpaces(
+            reprocessor
+                .images(replacer)
+                .scripts(replacer)
+                .stylesheets(replacer)
+                .fromHtml(html)
+        ).should.eql(expected);
+    });
 
-    results = reprocessor.fromHtml(emptyHtml);
-    t.strictEqual(results, emptyHtml);
+    it('should delete HTML token if plugin returns "null" in token handler', function () {
+        var plugin = {
+            name: 'everything',
+            extends: 'reprocess',
 
-    t.done();
-};
+            init: function (env, replacer) {
+                this.replacer = replacer;
+            },
 
-exports['.stylesheets'] = function (t) {
-    var reprocessor = ineed.reprocess.stylesheets(function (baseUrl, href) {
-            t.ok(baseUrl);
-            return href + '42';
-        }),
-        expected = readFile('../data/reprocessed_stylesheets.html');
+            onDoctype: function () {
+                return this.replacer();
+            },
 
-    var results = reprocessor.fromHtml(html);
-    t.strictEqual(unifySpaces(results), unifySpaces(expected));
+            onStartTag: function () {
+                return this.replacer();
+            },
 
-    results = reprocessor.fromHtml(emptyHtml);
-    t.strictEqual(results, emptyHtml);
+            onEndTag: function () {
+                return this.replacer();
+            },
 
-    t.done();
-};
+            onText: function () {
+                return this.replacer();
+            },
 
-exports['.texts'] = function (t) {
-    var reprocessor = ineed.reprocess.texts(function (text, encodeHtml) {
-            if (text === 'ullamco laboris')
-                return encodeHtml('<script>') + '&donotencodeme';
+            onComment: function () {
+                return this.replacer();
+            }
+        };
 
-            return text.toUpperCase();
-        }),
-        expected = readFile('../data/reprocessed_texts.html');
-
-    var results = reprocessor.fromHtml(html);
-    t.strictEqual(unifySpaces(results), unifySpaces(expected));
-
-    results = reprocessor.fromHtml(emptyHtml);
-    t.strictEqual(results, emptyHtml);
-
-    t.done();
-};
-
-exports['.title'] = function (t) {
-    var reprocessor = ineed.reprocess.title(function (title) {
-            return title.toUpperCase();
-        }),
-        expected = readFile('../data/reprocessed_title.html');
-
-    var results = reprocessor.fromHtml(html);
-    t.strictEqual(unifySpaces(results), unifySpaces(expected));
-
-    results = reprocessor.fromHtml(emptyHtml);
-    t.strictEqual(results, emptyHtml);
-
-    t.done();
-};
-
-
-exports['Multiple plugins'] = function (t) {
-    var replacer = function (baseUrl, url) {
-            return url + '42';
-        },
-        reprocessor = ineed.reprocess.images(replacer).scripts(replacer).stylesheets(replacer),
-        expected = readFile('../data/reprocessed_multiple_plugins.html');
-
-    var results = reprocessor.fromHtml(html);
-    t.strictEqual(unifySpaces(results), unifySpaces(expected));
-
-    //NOTE: check that duplicate plugins are ignored
-    results = reprocessor.images(replacer).scripts(replacer).stylesheets(replacer).fromHtml(html);
-    t.strictEqual(unifySpaces(results), unifySpaces(expected));
-
-    t.done();
-};
-
-exports['Delete content'] = function (t) {
-    var cleaningPlugin = {
-        name: 'cleanEverything',
-        extends: 'reprocess',
-
-        init: function () {
-        },
-
-        onDoctype: function () {
-            return null;
-        },
-
-        onStartTag: function () {
-            return null;
-        },
-
-        onEndTag: function () {
-            return null;
-        },
-
-        onText: function () {
-            return null;
-        },
-
-        onComment: function () {
-            return null;
-        }
-
-    };
-
-    var result = ineed.using(cleaningPlugin).reprocess.cleanEverything().fromHtml(html);
-
-    t.strictEqual(result, emptyHtml);
-
-    t.done();
-};
+        ineed
+            .using(plugin)
+            .reprocess
+            .everything(function () {
+                return null;
+            })
+            .fromHtml(html)
+            .should.eql(emptyHtml);
+    });
+});
