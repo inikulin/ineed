@@ -220,7 +220,7 @@ ineed
 ```
 
 In general plugins are objects with the following properties:
-*  `name` - unique name of the plugin. Required property. It should reflect the target of the plugin action. This field will extend `.collect` or `.reprocess` objects and will be used as result property name for `.collect` action. E.g. `plugin` has `name='tagNames'`. If it extends `.collect`:
+*  **`name`** - unique name of the plugin. Required property. It should reflect the target of the plugin action. This field will extend `.collect` or `.reprocess` objects and will be used as result property name for `.collect` action. E.g. `plugin` has `name='tagNames'`. If it extends `.collect`:
 ```js
 //Enable plugin and use it
 var result = ineed.using(plugin).collect.tagNames.fromHtml(html);
