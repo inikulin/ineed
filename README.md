@@ -98,7 +98,7 @@ And the `resultHtml` will be:
 `ineed` doesn't build and traverse DOM-tree, it operates on sequence of HTML tokens instead. Whole processing is done in  [one-pass](http://en.wikipedia.org/wiki/One-pass_algorithm), therefore, **it's blazing fast**!
 
 
-`ineed` provides built-in collectors and reprocessors that covers a wide variety of common use cases. However, if you feel that something is missing, then you can easily extend it with custom plugins.
+`ineed` provides built-in collectors and reprocessors that covers a wide variety of common use cases. However, if you feel that something is missing, then you can easily extend it with [custom plugins](#custom-plugins).
 
 ##Install
 ```
@@ -222,7 +222,7 @@ ineed
 
 ###Common structure
 
-Plugins of both kinds are objects and in addition to kind-specific properties they should have the following properties:
+Plugins of both kinds are objects and in addition to the kind-specific properties they should have the following properties:
 ####.extends
 Indicates which action will be extended by plugin. Can be `'collect'` or `'reprocess'`. Required field.
 
@@ -289,7 +289,7 @@ Where `startTag`:
 
 
 ###Collecting plugins
-Collecting plugins in addition to common properties should have `.getCollection()` method that should return items collected by plugin.
+Collecting plugins in addition to [common properties](#common-structure) should have `.getCollection()` method that should return items collected by plugin.
 
 *Example of the collecting plugin:*
 ```js
@@ -336,7 +336,7 @@ var plugin = {
     extends: 'replace',
     name: 'tagNamesInBody',
 
-    init: function (ctx, replace) {
+    init: function (ctx, replacer) {
         this.ctx = ctx;
         this.replacer = replacer;
     },
