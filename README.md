@@ -6,7 +6,7 @@
 
 *Web scraping and HTML-reprocessing. The easy way.*
 
-`ineed` allows you collect useful data from web pages using simple and fancy API. Let's collect images, hyperlinks, scripts and stylesheets from www.google.com:
+`ineed` allows you collect useful data from web pages using simple and nice API. Let's collect images, hyperlinks, scripts and stylesheets from www.google.com:
 
 ```js
 
