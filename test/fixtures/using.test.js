@@ -63,6 +63,18 @@ describe('iwant.using()', function () {
         result.should.eql(expected);
     });
 
+    it('should create new instance of the API host', function () {
+        var newInstance = ineed.using({
+            name: 'coolPlugin',
+            extends: 'reprocess',
+            init: noop
+        });
+
+        ineed.should.not.eql(newInstance);
+        ineed.reprocess.should.not.have.property('coolPlugin');
+        newInstance.reprocess.should.have.property('coolPlugin');
+    });
+
 
     describe('Plugin validation', function () {
 
