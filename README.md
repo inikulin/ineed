@@ -224,7 +224,7 @@ There are two kinds of plugins: those that extends `.collect` action and those t
 ###Common plugin structure
 Plugins of both kinds are objects and in addition to kind-specific properties they should have the following properties:
 ####.extends
-Indicates which action will be extended by plugin. Can be `'collect'` or `'reprocessor'`. Required field.
+Indicates which action will be extended by plugin. Can be `'collect'` or `'reprocess'`. Required field.
 
 #### .name
 Unique name of the plugin. Required property. It should reflect the target of the plugin action. This field will extend `.collect` or `.reprocess` objects and will be used as result property name for `.collect` action. E.g. `plugin` has `name='tagNames'`. If it extends `.collect`:
