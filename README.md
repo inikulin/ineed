@@ -19,7 +19,7 @@ ineed.collect.images.hyperlinks.scripts.stylesheets.from('http://www.google.com'
 
 ```
 
-Also, it can be used to build HTML-reprocessing pipelines with elegance. E.g. we have the following `html`:
+Also, it can be used to build HTML-reprocessing pipelines (like [jch/html-pipeline](https://github.com/jch/html-pipeline) but for node) with elegance. E.g. we have the following `html`:
 ```html
 <!DOCTYPE html>
 <html>
