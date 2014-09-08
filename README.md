@@ -324,7 +324,7 @@ console.log(results.tagNamesInBody);
 ```
 
 ###Reprocessing plugins
-Reprocessing plugin's `init` method receives `replacer()` function as it's second argument. If token handler returns `null` then token will be deleted from the pipeline and no farther processing by other plugins will be performed on it and it will not appear in the resulting HTML. If handler returns modified token then it will be passed to the farther plugins and will appear in the resulting HTML. If handler doesn't returns value or returns `undefined` then token will be passed unmodified to the farther plugins.
+Reprocessing plugin's `init` method in addition to `ctx` object receives all arguments passed to plugin in pipeline (e.g. `replacer()` function). If token handler returns `null` then token will be deleted from the pipeline and no farther processing by other plugins will be performed on it and it will not appear in the resulting HTML. If handler returns modified token then it will be passed to the farther plugins and will appear in the resulting HTML. If handler doesn't returns value or returns `undefined` then token will be passed unmodified to the farther plugins.
 
 *Example of the reprocessing plugin:*
 ```js
