@@ -221,10 +221,10 @@ ineed
 
 Plugins of both kinds are objects and in addition to the kind-specific properties they should have the following properties:
 ####.extends
-Indicates which action will be extended by plugin. Can be `'collect'` or `'reprocess'`. Required field.
+Indicates which action will be extended by plugin. Can be `'collect'` or `'reprocess'`. Required property.
 
 #### .name
-Name of the plugin. Required property. It should reflect the target of the plugin action. This field will extend `.collect` or `.reprocess` objects and will be used as result property name for `.collect` action. E.g. `plugin` has `name='tagNames'`. If it extends `.collect`:
+Name of the plugin. Required property. It should reflect the target of the plugin action. Plugin will be accessable under the `name` in the `.collect` or `.reprocess` objects and will be used as result property name for `.collect` action. E.g. `plugin` has `name='tagNames'`. If it extends `.collect`:
 ```js
 //Enable plugin and use it
 var result = ineed.using(plugin).collect.tagNames.fromHtml(html);
@@ -238,7 +238,7 @@ If it extends `.reprocess`:
  var reprocessedHtml = ineed
         .using(plugin)
         .reprocess
-        .startTags(function (tagName) {
+        .tagNames(function (tagName) {
             if (tagName === 'applet')
                 return 'object';
         })
