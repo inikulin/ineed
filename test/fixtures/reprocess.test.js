@@ -1,5 +1,6 @@
 var fs = require('fs'),
     path = require('path'),
+    should = require('should'),
     ineed = require('../../index');
 
 
