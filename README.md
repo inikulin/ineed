@@ -330,7 +330,7 @@ Reprocessing plugin's `init` method receives `replacer()` function as it's secon
 ```js
 //Replaces or deletes tagNames in <body>
 var plugin = {
-    extends: 'replace',
+    extends: 'reprocess',
     name: 'tagNamesInBody',
 
     init: function (ctx, replacer) {
