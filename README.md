@@ -95,7 +95,7 @@ And the `resultHtml` will be:
 ```
 
 
-`ineed` doesn't build and traverse DOM-tree, it operates on sequence of HTML tokens instead. Whole processing is done in  [one-pass](http://en.wikipedia.org/wiki/One-pass_algorithm), therefore, **it's blazing fast**! Token stream is produced by [parse5](https://github.com/inikulin/parse5) which parses HTML exactly the same way modern browsers do.
+`ineed` doesn't build and traverse DOM-tree, it operates on sequence of HTML tokens instead. Whole processing is done in  [one-pass](http://en.wikipedia.org/wiki/One-pass_algorithm), therefore, **it's blazing fast**! The token stream is produced by [parse5](https://github.com/inikulin/parse5) which parses HTML exactly the same way modern browsers do.
 
 
 `ineed` provides built-in collectors and reprocessors that covers a wide variety of common use cases. However, if you feel that something is missing, then you can easily extend it with [custom plugins](#custom-plugins).
