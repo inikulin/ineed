@@ -1,6 +1,6 @@
 ![logo](https://raw.github.com/inikulin/ineed/master/logo.png)
 
-[![Build Status](http://img.shields.io/travis/inikulin/ineed.svg?style=flat-square)](https://travis-ci.org/inikulin/ineed)
+[![Build Status](https://api.travis-ci.org/inikulin/ineed.svg)](https://travis-ci.org/inikulin/ineed)
 
 
 
