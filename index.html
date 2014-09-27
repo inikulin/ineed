@@ -1,0 +1,547 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>ineed by inikulin</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>ineed</h1>
+        <p>Web scraping and HTML-reprocessing. The easy way.</p>
+
+        <p class="view"><a href="https://github.com/inikulin/ineed">View the Project on GitHub <small>inikulin/ineed</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/inikulin/ineed/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/inikulin/ineed/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/inikulin/ineed">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p><img src="https://raw.github.com/inikulin/ineed/master/logo.png" alt="logo"></p>
+
+<p><em>Web scraping and HTML-reprocessing. The easy way.</em></p>
+
+<p><code>ineed</code> allows you collect useful data from web pages using simple and nice API. Let's collect images, hyperlinks, scripts and stylesheets from <a href="http://www.google.com">www.google.com</a>:</p>
+
+<div class="highlight highlight-js"><pre>
+<span class="kd">var</span> <span class="nx">ineed</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'ineed'</span><span class="p">);</span>
+
+<span class="nx">ineed</span><span class="p">.</span><span class="nx">collect</span><span class="p">.</span><span class="nx">images</span><span class="p">.</span><span class="nx">hyperlinks</span><span class="p">.</span><span class="nx">scripts</span><span class="p">.</span><span class="nx">stylesheets</span><span class="p">.</span><span class="nx">from</span><span class="p">(</span><span class="s1">'http://www.google.com'</span><span class="p">,</span>
+    <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+    <span class="p">});</span>
+
+</pre></div>
+
+<p>Also, it can be used to build HTML-reprocessing pipelines (like <a href="https://github.com/jch/html-pipeline">jch/html-pipeline</a> but for Node) with elegance. E.g. we have the following <code>html</code>:</p>
+
+<div class="highlight highlight-html"><pre><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;&lt;/title&gt;</span>
+    <span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"text/css"</span><span class="nt">&gt;</span>
+        <span class="nt">border-radius</span><span class="o">()</span>
+          <span class="nt">-webkit-border-radius</span><span class="o">:</span> <span class="nt">arguments</span>
+          <span class="nt">-moz-border-radius</span><span class="o">:</span> <span class="nt">arguments</span>
+          <span class="nt">border-radius</span><span class="o">:</span> <span class="nt">arguments</span>
+
+        <span class="nt">ul</span>
+          <span class="nt">margin</span><span class="o">:</span> <span class="nt">5px</span>
+          <span class="nt">border</span><span class="o">:</span> <span class="nt">1px</span> <span class="nt">solid</span>
+          <span class="nt">border-radius</span><span class="o">:</span> <span class="nt">5px</span>
+    <span class="nt">&lt;/style&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+This is an H1
+=============
+*   Red
+*   Green
+*   Blue
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre></div>
+
+<p>Let's render it's <code>&lt;style&gt;</code> with <a href="https://github.com/learnboost/stylus">stylus</a> and convert text from Markdown to HTML using <a href="https://github.com/chjj/marked">marked</a> then assemble results back to HTML: </p>
+
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">ineed</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'ineed'</span><span class="p">),</span>
+    <span class="nx">stylus</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'stylus'</span><span class="p">),</span>
+    <span class="nx">marked</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'marked'</span><span class="p">);</span>
+
+<span class="kd">function</span> <span class="nx">renderStylus</span><span class="p">(</span><span class="nx">code</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">css</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+
+    <span class="nx">stylus</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">code</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">css</span> <span class="o">=</span> <span class="nx">result</span><span class="p">;</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nx">css</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">resultHtml</span> <span class="o">=</span> <span class="nx">ineed</span><span class="p">.</span><span class="nx">reprocess</span><span class="p">.</span><span class="nx">cssCode</span><span class="p">(</span><span class="nx">renderStylus</span><span class="p">).</span><span class="nx">texts</span><span class="p">(</span><span class="nx">marked</span><span class="p">).</span><span class="nx">fromHtml</span><span class="p">(</span><span class="nx">html</span><span class="p">);</span>
+</pre></div>
+
+<p>And the <code>resultHtml</code> will be:</p>
+
+<div class="highlight highlight-html"><pre><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;&lt;/title&gt;</span>
+    <span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"text/css"</span><span class="nt">&gt;</span>
+        <span class="nc">.ul</span> <span class="p">{</span>
+            <span class="k">margin</span><span class="o">:</span> <span class="m">5px</span><span class="p">;</span>
+            <span class="k">border</span><span class="o">:</span> <span class="m">1px</span> <span class="k">solid</span><span class="p">;</span>
+            <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="k">border</span><span class="o">-</span><span class="n">radius</span><span class="o">:</span> <span class="m">5px</span><span class="p">;</span>
+            <span class="o">-</span><span class="n">moz</span><span class="o">-</span><span class="k">border</span><span class="o">-</span><span class="n">radius</span><span class="o">:</span> <span class="m">5px</span><span class="p">;</span>
+            <span class="k">border</span><span class="o">-</span><span class="n">radius</span><span class="o">:</span> <span class="m">5px</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="nt">&lt;/style&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;h1</span> <span class="na">id=</span><span class="s">"this-is-an-h1"</span><span class="nt">&gt;</span>This is an H1<span class="nt">&lt;/h1&gt;</span>
+<span class="nt">&lt;ul&gt;</span>
+    <span class="nt">&lt;li&gt;</span>Red<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;li&gt;</span>Green<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;li&gt;</span>Blue<span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre></div>
+
+<p><code>ineed</code> doesn't build and traverse DOM-tree, it operates on sequence of HTML tokens instead. Whole processing is done in  <a href="http://en.wikipedia.org/wiki/One-pass_algorithm">one-pass</a>, therefore, <strong>it's blazing fast</strong>! The token stream is produced by <a href="https://github.com/inikulin/parse5">parse5</a> which parses HTML exactly the same way modern browsers do.</p>
+
+<p><code>ineed</code> provides built-in collectors and reprocessors that covers a wide variety of common use cases. However, if you feel that something is missing, then you can easily extend <code>ineed</code> with <a href="#custom-plugins">custom plugins</a>.</p>
+
+<h2>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<pre><code>$ npm install ineed
+</code></pre>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>The general form:</p>
+
+<h4>
+<a name="ineedactionpluginfrom" class="anchor" href="#ineedactionpluginfrom"><span class="octicon octicon-link"></span></a><code>ineed.&lt;action&gt;[.&lt;plugin&gt;...].&lt;from*&gt;</code>
+</h4>
+
+<h3>
+<a name="from-methods" class="anchor" href="#from-methods"><span class="octicon octicon-link"></span></a>from* methods</h3>
+
+<h5>
+<a name="fromhtmlhtml" class="anchor" href="#fromhtmlhtml"><span class="octicon octicon-link"></span></a>.fromHtml(html)</h5>
+
+<p>Accepts <code>html</code> string as an argument and synchronously returns <code>result</code> of the action.</p>
+
+<p><em>Example:</em></p>
+
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">ineed</span><span class="p">.</span><span class="nx">collect</span><span class="p">.</span><span class="nx">texts</span><span class="p">.</span><span class="nx">fromHtml</span><span class="p">(</span><span class="s1">'&lt;div&gt;Hey ya&lt;/div&gt;'</span><span class="p">);</span>
+</pre></div>
+
+<h5>
+<a name="fromoptions-callback" class="anchor" href="#fromoptions-callback"><span class="octicon octicon-link"></span></a>.from(options, callback)</h5>
+
+<p>Asynchronously loads specified page and invokes <code>callback(err, response, result)</code>. It passes <code>response</code> object to <code>callback</code> in case if you need response headers or status codes. The first argument can be either a <code>url</code> or an <code>options</code> object.
+The set of options is the same as in <a href="https://github.com/mikeal" class="user-mention">@mikeal</a>'s <a href="https://github.com/mikeal/request#requestoptions-callback">request</a>, so you can use POST method, set request headers or do any other advanced setup for the page request.</p>
+
+<p><em>Examples:</em></p>
+
+<div class="highlight highlight-js"><pre><span class="nx">ineed</span><span class="p">.</span><span class="nx">collect</span><span class="p">.</span><span class="nx">jsCode</span><span class="p">.</span><span class="nx">from</span><span class="p">(</span><span class="s1">'https://github.com'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">headers</span><span class="p">);</span>    
+<span class="p">});</span>
+</pre></div>
+
+<div class="highlight highlight-js"><pre><span class="nx">ineed</span><span class="p">.</span><span class="nx">collect</span><span class="p">.</span><span class="nx">title</span><span class="p">.</span><span class="nx">from</span><span class="p">({</span>
+    <span class="nx">url</span><span class="o">:</span> <span class="s1">'https://test.domain/'</span><span class="p">,</span>
+    <span class="nx">method</span><span class="o">:</span> <span class="s1">'POST'</span><span class="p">,</span>
+    <span class="nx">form</span><span class="o">:</span> <span class="s1">'input=test'</span>
+<span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span>
+<span class="p">});</span>
+
+</pre></div>
+
+<h3>
+<a name="collect-action" class="anchor" href="#collect-action"><span class="octicon octicon-link"></span></a>.collect action</h3>
+
+<p>Collects information specified by plugin set. The <code>result</code> of the action is an object that contains individual plugin outputs as properties.</p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">ineed</span><span class="p">.</span><span class="nx">collect</span><span class="p">.</span><span class="nx">texts</span><span class="p">.</span><span class="nx">images</span><span class="p">.</span><span class="nx">scripts</span><span class="p">.</span><span class="nx">fromHtml</span><span class="p">(</span><span class="nx">html</span><span class="p">);</span>
+</pre></div>
+
+<p>will produce <code>result</code>:</p>
+
+<div class="highlight highlight-js"><pre><span class="p">{</span>
+    <span class="s2">"texts"</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">collected</span> <span class="nx">texts</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="s2">"images"</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">collected</span> <span class="nx">images</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="s2">"scripts"</span> <span class="o">:</span> <span class="o">&lt;</span><span class="nx">collected</span> <span class="nx">scripts</span><span class="o">&gt;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Built-in plugins:</p>
+
+<table>
+<thead><tr>
+<th>Plugin</th>
+<th>Description</th>
+<th>Output</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>.comments</code></td>
+<td>Collects HTML comments</td>
+<td>Array of comment string</td>
+</tr>
+<tr>
+<td><code>.cssCode</code></td>
+<td>Collects CSS code enclosed in <code>&lt;style&gt;</code> tags</td>
+<td>Array of CSS code strings</td>
+</tr>
+<tr>
+<td><code>.hyperlinks</code></td>
+<td>Collects URL (<em>see remark below</em>) and text of the hyperlinks</td>
+<td>Array of <code>{href:[String], text:[String]}</code> objects</td>
+</tr>
+<tr>
+<td><code>.images</code></td>
+<td>Collects absolute URL (<em>see remark below</em>) and <code>alt</code> attribute of the images</td>
+<td>Array of <code>{src:[String], alt:[String]}</code> objects</td>
+</tr>
+<tr>
+<td><code>.jsCode</code></td>
+<td>Collects JavaScript code enclosed in <code>&lt;script&gt;</code> tags</td>
+<td>Array of JavaScript code strings</td>
+</tr>
+<tr>
+<td><code>.scripts</code></td>
+<td>Collects URL (<em>see remark below</em>) of the external <code>.js</code>-files, specified via <code>&lt;script&gt;</code> tags with <code>src</code> attribute</td>
+<td>Array of script URLs</td>
+</tr>
+<tr>
+<td><code>.stylesheets</code></td>
+<td>Collects URL (<em>see remark below</em>) of the external <code>*.css</code>-files, specified via <code>&lt;link&gt;</code> tag</td>
+<td>Array of stylesheet URLs</td>
+</tr>
+<tr>
+<td><code>.texts</code></td>
+<td>Collects all text nodes in <code>&lt;body&gt;</code> of the document with except for <code>&lt;script&gt;</code> and <code>&lt;style&gt;</code> tag's content. Speaking clearly: all end-user visible text.</td>
+<td>Array of text strings</td>
+</tr>
+<tr>
+<td><code>.title</code></td>
+<td>Collects document title</td>
+<td>Document title string</td>
+</tr>
+</tbody>
+</table><p><em>Remark:</em> All URLs are collected in respect to <code>&lt;base&gt;</code> tag. The resulting URL will be an absolute URL if <code>.from()</code> method was used, <code>&lt;base&gt;</code> tag constains absolute URL or raw collected URL is already absolute.</p>
+
+<h3>
+<a name="reprocess-action" class="anchor" href="#reprocess-action"><span class="octicon octicon-link"></span></a>.reprocess action</h3>
+
+<p>Applies plugins' replacing functions to the source HTML-string. The <code>result</code> of the action is the reprocessed HTML-string.</p>
+
+<p><em>Example</em>:</p>
+
+<div class="highlight highlight-js"><pre><span class="c1">//Delete all HTML comments and render emoji</span>
+<span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">ineed</span><span class="p">.</span><span class="nx">reprocess</span>
+    <span class="p">.</span><span class="nx">comments</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">texts</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">escapeHtml</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">escapeHtml</span><span class="p">(</span><span class="nx">text</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/:beer:/g</span><span class="p">,</span> <span class="s1">'&lt;img src="emoji/unicode/1f37a.png" alt=":beer:"&gt;'</span><span class="p">);</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">fromHtml</span><span class="p">(</span><span class="nx">html</span><span class="p">);</span>
+</pre></div>
+
+<p>Built-in plugins:</p>
+
+<table>
+<thead><tr>
+<th>Plugin</th>
+<th>
+<code>replacer</code> arguments</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>.comments(replacer)</code></td>
+<td><code>replacer(commentString)</code></td>
+<td>Replaces HTML <code>commentString</code> with the value returned by <code>replacer</code>. Comment will be deleted from markup if <code>null</code> is returned.</td>
+</tr>
+<tr>
+<td><code>.cssCode(replacer)</code></td>
+<td><code>replacer(cssCodeString)</code></td>
+<td>Replaces <code>cssCodeString</code> enclosed in <code>&lt;style&gt;</code> tag with the value returned by <code>replacer</code>.</td>
+</tr>
+<tr>
+<td>
+<code>.hyperlinks(replacer</code>)</td>
+<td><code>replacer(pageBaseUrl, hrefAttrValue)</code></td>
+<td>Replaces <code>&lt;a&gt;</code> tag <code>href</code> attribute value with the value returned by <code>replacer</code>.</td>
+</tr>
+<tr>
+<td><code>.images(replacer)</code></td>
+<td><code>replacer(pageBaseUrl, srcAttrValue)</code></td>
+<td>Replaces <code>&lt;img&gt;</code> tag <code>src</code> attribute value with the value returned by <code>replacer</code>.</td>
+</tr>
+<tr>
+<td><code>.jsCode(replacer)</code></td>
+<td><code>replacer(jsCodeString)</code></td>
+<td>Replaces <code>jsCodeString</code> enclosed in the <code>&lt;script&gt;</code> tag with the value returned by <code>replacer</code>.</td>
+</tr>
+<tr>
+<td><code>.scripts(replacer)</code></td>
+<td><code>replacer(pageBaseUrl, srcAttrValue)</code></td>
+<td>Replaces <code>&lt;script&gt;</code> tag <code>src</code> attribute value with the value returned by <code>replacer</code>.</td>
+</tr>
+<tr>
+<td><code>.stylesheets(replacer)</code></td>
+<td><code>replacer(pageBaseUrl, hrefAttrValue)</code></td>
+<td>Replaces <code>&lt;link rel="stylesheet"&gt;</code> tag <code>href</code> attribute value with the value returned by <code>replacer</code>.</td>
+</tr>
+<tr>
+<td><code>.texts(replacer)</code></td>
+<td><code>replacer(text, escapeHtmlFunc)</code></td>
+<td>Replaces <code>text</code> with the value returned by <code>replacer</code>. Returned value will be not HTML escaped, so HTML code can be used as <code>replacer</code> result. You can manually apply <code>escapeHtmlFunc(str)</code> to force HTML escaping of the result.</td>
+</tr>
+<tr>
+<td><code>.title(replacer)</code></td>
+<td><code>replacer(title)</code></td>
+<td>Replaces page <code>title</code> with the value returned by <code>replacer</code>.</td>
+</tr>
+</tbody>
+</table><h2>
+<a name="custom-plugins" class="anchor" href="#custom-plugins"><span class="octicon octicon-link"></span></a>Custom plugins</h2>
+
+<p>There are two kinds of plugins: those that extends <code>.collect</code> action and those that extends <code>.reprocess</code> action. To enable plugin use <code>.using()</code> function, which will return new instance of <code>ineed</code> with enabled plugin.</p>
+
+<p><em>Example:</em></p>
+
+<div class="highlight highlight-js"><pre><span class="nx">ineed</span>
+    <span class="p">.</span><span class="nx">using</span><span class="p">(</span><span class="nx">myPlugin1</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">using</span><span class="p">(</span><span class="nx">myPlugin2</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">collect</span>
+    <span class="p">...</span>
+</pre></div>
+
+<h3>
+<a name="common-structure" class="anchor" href="#common-structure"><span class="octicon octicon-link"></span></a>Common structure</h3>
+
+<p>Plugins of both kinds are objects and in addition to the kind-specific properties they should have the following properties:</p>
+
+<h4>
+<a name="extends" class="anchor" href="#extends"><span class="octicon octicon-link"></span></a>.extends</h4>
+
+<p>Indicates which action will be extended by plugin. Can be <code>'collect'</code> or <code>'reprocess'</code>. Required property.</p>
+
+<h4>
+<a name="name" class="anchor" href="#name"><span class="octicon octicon-link"></span></a>.name</h4>
+
+<p>Name of the plugin. Required property. It should reflect the target of the plugin action. Plugin will be accessable under the <code>name</code> in the <code>.collect</code> or <code>.reprocess</code> objects and will be used as result property name for <code>.collect</code> action. E.g. <code>plugin</code> has <code>name='tagNames'</code>. If it extends <code>.collect</code>:</p>
+
+<div class="highlight highlight-js"><pre><span class="c1">//Enable plugin and use it</span>
+<span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">ineed</span><span class="p">.</span><span class="nx">using</span><span class="p">(</span><span class="nx">plugin</span><span class="p">).</span><span class="nx">collect</span><span class="p">.</span><span class="nx">tagNames</span><span class="p">.</span><span class="nx">fromHtml</span><span class="p">(</span><span class="nx">html</span><span class="p">);</span>
+
+<span class="c1">//Access plugin results</span>
+<span class="kd">var</span> <span class="nx">pluginResults</span> <span class="o">=</span> <span class="nx">result</span><span class="p">.</span><span class="nx">tagNames</span><span class="p">;</span>
+</pre></div>
+
+<p>If it extends <code>.reprocess</code>:</p>
+
+<div class="highlight highlight-js"><pre> <span class="kd">var</span> <span class="nx">reprocessedHtml</span> <span class="o">=</span> <span class="nx">ineed</span>
+        <span class="p">.</span><span class="nx">using</span><span class="p">(</span><span class="nx">plugin</span><span class="p">)</span>
+        <span class="p">.</span><span class="nx">reprocess</span>
+        <span class="p">.</span><span class="nx">tagNames</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">tagName</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">tagName</span> <span class="o">===</span> <span class="s1">'applet'</span><span class="p">)</span>
+                <span class="k">return</span> <span class="s1">'object'</span><span class="p">;</span>
+        <span class="p">})</span>
+        <span class="p">.</span><span class="nx">fromHtml</span><span class="p">(</span><span class="nx">html</span><span class="p">);</span>
+</pre></div>
+
+<h4>
+<a name="initctx-" class="anchor" href="#initctx-"><span class="octicon octicon-link"></span></a>.init(ctx, ...)</h4>
+
+<p>Function that initializes plugin. Required field. It always receives <code>ctx</code> object as it first argument. <code>ctx</code> contains
+some useful common information regarding current pipeline state:</p>
+
+<h5>
+<a name="ctxbaseurl" class="anchor" href="#ctxbaseurl"><span class="octicon octicon-link"></span></a>ctx.baseUrl</h5>
+
+<p>Base URL of all resources on the page with respect to <code>&lt;base&gt;</code> tag.</p>
+
+<h5>
+<a name="ctxleadingstarttag" class="anchor" href="#ctxleadingstarttag"><span class="octicon octicon-link"></span></a>ctx.leadingStartTag</h5>
+
+<p>Leading non-self-closing start tag for the current HTML token. Can be used to determine parent of the text nodes. Will be <code>null</code> if the leading start tag was self-closing or any leading end tag was met.</p>
+
+<h5>
+<a name="ctxinbody" class="anchor" href="#ctxinbody"><span class="octicon octicon-link"></span></a>ctx.inBody</h5>
+
+<p>Indicates if emitted tokens are in <code>&lt;body&gt;</code> tag. </p>
+
+<h4>
+<a name="token-handlers" class="anchor" href="#token-handlers"><span class="octicon octicon-link"></span></a>Token handlers</h4>
+
+<p>Plugin can have one or more HTML token handlers:</p>
+
+<ul>
+<li> <code>.onDoctype(doctype)</code>
+</li>
+</ul><p>Where <code>doctype</code>:</p>
+
+<div class="highlight highlight-js"><pre><span class="p">{</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="p">[</span><span class="nb">String</span><span class="p">],</span>
+    <span class="nx">publicId</span><span class="o">:</span> <span class="p">[</span><span class="nb">String</span><span class="p">],</span>
+    <span class="nx">systemId</span><span class="o">:</span> <span class="p">[</span><span class="nb">String</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+
+<ul>
+<li> <code>.onStartTag(startTag)</code>
+</li>
+</ul><p>Where <code>startTag</code>: </p>
+
+<div class="highlight highlight-js"><pre><span class="p">{</span>
+    <span class="nx">tagName</span><span class="o">:</span> <span class="p">[</span><span class="nb">String</span><span class="p">],</span>
+    <span class="nx">attrs</span><span class="o">:</span> <span class="p">[</span><span class="nb">Array</span><span class="p">],</span>
+    <span class="nx">selfClosing</span><span class="o">:</span> <span class="p">[</span><span class="nb">Boolean</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+
+<ul>
+<li> <code>.onEndTag(tagName)</code>
+</li>
+<li> <code>.onText(text)</code>
+</li>
+<li> <code>.onComment(commentText)</code>
+</li>
+</ul><h3>
+<a name="collecting-plugins" class="anchor" href="#collecting-plugins"><span class="octicon octicon-link"></span></a>Collecting plugins</h3>
+
+<p>Collecting plugins in addition to <a href="#common-structure">common properties</a> should have <code>.getCollection()</code> method that should return items collected by plugin.</p>
+
+<p><em>Example of the collecting plugin:</em></p>
+
+<div class="highlight highlight-js"><pre><span class="c1">//Collects tagNames in &lt;body&gt;</span>
+<span class="kd">var</span> <span class="nx">plugin</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="kr">extends</span><span class="o">:</span> <span class="s1">'collect'</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">'tagNamesInBody'</span><span class="p">,</span>
+
+    <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ctx</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">ctx</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">tagNames</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="p">},</span>
+
+    <span class="nx">addTagName</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">tagName</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">inBody</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">tagNames</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">tagName</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">tagNames</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">tagName</span><span class="p">);</span>
+    <span class="p">},</span>
+
+    <span class="nx">onStartTag</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">startTag</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">addTagName</span><span class="p">(</span><span class="nx">startTag</span><span class="p">.</span><span class="nx">tagName</span><span class="p">);</span>
+    <span class="p">},</span>
+
+    <span class="nx">onEndTag</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">tagName</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">addTagName</span><span class="p">(</span><span class="nx">tagName</span><span class="p">);</span>
+    <span class="p">},</span>
+
+    <span class="nx">getCollection</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">tagNames</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">//Let's use it</span>
+<span class="kd">var</span> <span class="nx">results</span> <span class="o">=</span> <span class="nx">ineed</span><span class="p">.</span><span class="nx">using</span><span class="p">(</span><span class="nx">plugin</span><span class="p">).</span><span class="nx">collect</span><span class="p">.</span><span class="nx">tagNamesInBody</span><span class="p">.</span><span class="nx">fromHtml</span><span class="p">(</span><span class="nx">html</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">results</span><span class="p">.</span><span class="nx">tagNamesInBody</span><span class="p">);</span>
+</pre></div>
+
+<h3>
+<a name="reprocessing-plugins" class="anchor" href="#reprocessing-plugins"><span class="octicon octicon-link"></span></a>Reprocessing plugins</h3>
+
+<p>Reprocessing plugin's <code>init</code> method in addition to <code>ctx</code> object receives all arguments passed to plugin in pipeline (e.g. <code>replacer()</code> function). If token handler returns <code>null</code> then token will be deleted from the pipeline and no farther processing by other plugins will be performed on it and it will not appear in the resulting HTML. If handler returns modified token then it will be passed to the farther plugins and will appear in the resulting HTML. If handler doesn't returns value or returns <code>undefined</code> then token will be passed unmodified to the farther plugins.</p>
+
+<p><em>Example of the reprocessing plugin:</em></p>
+
+<div class="highlight highlight-js"><pre><span class="c1">//Replaces or deletes tagNames in &lt;body&gt;</span>
+<span class="kd">var</span> <span class="nx">plugin</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="kr">extends</span><span class="o">:</span> <span class="s1">'reprocess'</span><span class="p">,</span>
+    <span class="nx">name</span><span class="o">:</span> <span class="s1">'tagNamesInBody'</span><span class="p">,</span>
+
+    <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">replacer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">ctx</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">replacer</span> <span class="o">=</span> <span class="nx">replacer</span><span class="p">;</span>
+    <span class="p">},</span>
+
+    <span class="nx">onStartTag</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">startTag</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">inBody</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">startTag</span><span class="p">.</span><span class="nx">tagName</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">replacer</span><span class="p">(</span><span class="nx">startTag</span><span class="p">.</span><span class="nx">tagName</span><span class="p">);</span>
+
+            <span class="c1">//Delete token if tagName is null</span>
+            <span class="k">return</span> <span class="nx">startTag</span><span class="p">.</span><span class="nx">tagName</span> <span class="o">===</span> <span class="kc">null</span> <span class="o">?</span> <span class="kc">null</span> <span class="o">:</span> <span class="nx">startTag</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="nx">onEndTag</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">tagName</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">ctx</span><span class="p">.</span><span class="nx">inBody</span><span class="p">)</span>
+            <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">replacer</span><span class="p">(</span><span class="nx">tagName</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">//Let's use it</span>
+<span class="kd">var</span> <span class="nx">reprocessedHtml</span> <span class="o">=</span> <span class="nx">ineed</span>
+    <span class="p">.</span><span class="nx">using</span><span class="p">(</span><span class="nx">plugin</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">reprocess</span>
+    <span class="p">.</span><span class="nx">tagNamesInBody</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">tagName</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">//Delete &lt;noscript&gt; start and end tags</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">tagName</span> <span class="o">===</span> <span class="s1">'noscript'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+
+        <span class="c1">//Replace &lt;div&gt; with &lt;p&gt;</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">tagName</span> <span class="o">===</span> <span class="s1">'div'</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">'p'</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="nx">tagName</span><span class="p">;</span>
+    <span class="p">}).</span><span class="nx">fromHtml</span><span class="p">(</span><span class="nx">html</span><span class="p">);</span>
+
+</pre></div>
+
+<h2>
+<a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h2>
+
+<pre><code>$ npm test
+</code></pre>
+
+<h2>
+<a name="questions-or-suggestions" class="anchor" href="#questions-or-suggestions"><span class="octicon octicon-link"></span></a>Questions or suggestions?</h2>
+
+<p>If you have any questions, please feel free to create an issue <a href="https://github.com/inikulin/ineed/issues">here on github</a>.</p>
+
+<h2>
+<a name="author" class="anchor" href="#author"><span class="octicon octicon-link"></span></a>Author</h2>
+
+<p><a href="https://github.com/inikulin">Ivan Nikulin</a> (<a href="mailto:ifaaan@gmail.com">ifaaan@gmail.com</a>)</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/inikulin">inikulin</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
