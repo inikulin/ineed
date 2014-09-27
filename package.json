@@ -3,6 +3,7 @@
   "description": "Web scraping and HTML-reprocessing. The easy way.",
   "version": "1.0.2",
   "author": "Ivan Nikulin <ifaaan@gmail.com> (https://github.com/inikulin)",
+  "homepage" : "http://inikulin.github.io/ineed/",
   "dependencies": {
     "parse5": "1.1.2",
     "request": "2.40.0"
