@@ -6,13 +6,13 @@
 
 *Web scraping and HTML-reprocessing. The easy way.*
 
-`ineed` allows you collect useful data from web pages using simple and nice API. Let's collect images, hyperlinks, scripts and stylesheets from www.google.com:
+`ineed` allows you collect useful data from web pages using simple and nice API. Let's collect images, hyperlinks, scripts and stylesheets from http://google.com:
 
 ```js
 
 var ineed = require('ineed');
 
-ineed.collect.images.hyperlinks.scripts.stylesheets.from('http://www.google.com',
+ineed.collect.images.hyperlinks.scripts.stylesheets.from('http://google.com',
     function (err, response, result) {
         console.log(result);
     });
