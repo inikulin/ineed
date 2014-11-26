@@ -182,11 +182,11 @@ describe('.reprocess', function () {
 
     it('should support token emission', function () {
         var src = '<!DOCTYPE html><!--comment--><div>text</div>',
-            expected = '<!DOCTYPE html-yo><!DOCTYPE html-yo>' +
-                       '<!--comment-yo--><!--comment-yo-->' +
-                       '<div-yo><div-yo>' +
-                       'text-yotext-yo' +
-                       '</div-yo></div-yo>',
+            expected = '<!DOCTYPE yo-html-yo><!DOCTYPE yo-yo-html-yo>' +
+                       '<!--yo-comment-yo--><!--yo-yo-comment-yo-->' +
+                       '<yo-div-yo><yo-yo-div-yo>' +
+                       'yo-text-yoyo-yo-text-yo' +
+                       '</yo-div-yo></yo-yo-div-yo>',
             once = function (fn) {
                 var called = false;
 
@@ -200,8 +200,8 @@ describe('.reprocess', function () {
             emit = function (fnName) {
                 return function (token) {
                     //NOTE: Clone mutable tokens
-                    if(typeof token === 'object')
-                        token = Object.create(token);
+                    if (typeof token === 'object')
+                        token = JSON.parse(JSON.stringify(token));
 
                     this.ctx.emit[fnName](token);
                 };
@@ -255,10 +255,45 @@ describe('.reprocess', function () {
             }
         };
 
+        var plugin3 = {
+            name: 'prependYo',
+            extends: 'reprocess',
+
+            init: function (ctx) {
+                this.ctx = ctx;
+            },
+
+            onDoctype: function (doctype) {
+                doctype.name = 'yo-' + doctype.name;
+
+                return doctype;
+            },
+
+            onStartTag: function (startTag) {
+                startTag.tagName = 'yo-' + startTag.tagName;
+
+                return startTag;
+            },
+
+            onEndTag: function (tagName) {
+                return 'yo-' + tagName;
+            },
+
+            onText: function (text) {
+                return 'yo-' + text;
+            },
+
+            onComment: function (comment) {
+                return 'yo-' + comment;
+            }
+        };
+
         ineed
             .using(plugin1)
             .using(plugin2)
+            .using(plugin3)
             .reprocess
+            .prependYo()
             .duplicate()
             .appendYo()
             .fromHtml(src)
