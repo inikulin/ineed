@@ -145,7 +145,7 @@ describe('.reprocess', function () {
             name: 'everything',
             extends: 'reprocess',
 
-            init: function (env, replacer) {
+            init: function (ctx, replacer) {
                 this.replacer = replacer;
             },
 
@@ -178,5 +178,90 @@ describe('.reprocess', function () {
             })
             .fromHtml(html)
             .should.eql(emptyHtml);
+    });
+
+    it('should support token emission', function () {
+        var src = '<!DOCTYPE html><!--comment--><div>text</div>',
+            expected = '<!DOCTYPE html-yo><!DOCTYPE html-yo>' +
+                       '<!--comment-yo--><!--comment-yo-->' +
+                       '<div-yo><div-yo>' +
+                       'text-yotext-yo' +
+                       '</div-yo></div-yo>',
+            once = function (fn) {
+                var called = false;
+
+                return function () {
+                    if (!called) {
+                        called = true;
+                        fn.apply(this, arguments);
+                    }
+                };
+            },
+            emit = function (fnName) {
+                return function (token) {
+                    //NOTE: Clone mutable tokens
+                    if(typeof token === 'object')
+                        token = Object.create(token);
+
+                    this.ctx.emit[fnName](token);
+                };
+            };
+
+        var plugin1 = {
+            name: 'duplicate',
+            extends: 'reprocess',
+
+            init: function (ctx) {
+                this.ctx = ctx;
+            },
+
+            onDoctype: once(emit('doctype')),
+            onStartTag: once(emit('startTag')),
+            onEndTag: once(emit('endTag')),
+            onText: once(emit('text')),
+            onComment: once(emit('comment'))
+        };
+
+        var plugin2 = {
+            name: 'appendYo',
+            extends: 'reprocess',
+
+            init: function (ctx) {
+                this.ctx = ctx;
+            },
+
+            onDoctype: function (doctype) {
+                doctype.name += '-yo';
+
+                return doctype;
+            },
+
+            onStartTag: function (startTag) {
+                startTag.tagName += '-yo';
+
+                return startTag;
+            },
+
+            onEndTag: function (tagName) {
+                return tagName + '-yo';
+            },
+
+            onText: function (text) {
+                return text + '-yo';
+            },
+
+            onComment: function (comment) {
+                return comment + '-yo';
+            }
+        };
+
+        ineed
+            .using(plugin1)
+            .using(plugin2)
+            .reprocess
+            .duplicate()
+            .appendYo()
+            .fromHtml(src)
+            .should.eql(expected);
     });
 });
