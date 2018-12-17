@@ -32,5 +32,8 @@
   },
   "scripts": {
     "test": "node test/run_tests.js"
+  },
+  "engines": {
+    "node": ">=6"
   }
 }
