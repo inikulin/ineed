@@ -100,19 +100,19 @@ And the `resultHtml` will be:
 
 `ineed` provides built-in collectors and reprocessors that covers a wide variety of common use cases. However, if you feel that something is missing, then you can easily extend `ineed` with [custom plugins](#custom-plugins).
 
-##Install
+## Install
 ```
 $ npm install ineed
 ```
 
-##Usage
+## Usage
 The general form:
 
-####```ineed.<action>[.<plugin>...].<from*>```
+#### ```ineed.<action>[.<plugin>...].<from*>```
 
 
-###from* methods
-#####.fromHtml(html)
+### from* methods
+##### .fromHtml(html)
 Accepts `html` string as an argument and synchronously returns `result` of the action.
 
 *Example:*
@@ -120,7 +120,7 @@ Accepts `html` string as an argument and synchronously returns `result` of the a
 var result = ineed.collect.texts.fromHtml('<div>Hey ya</div>');
 ```
 
-#####.from(options, callback)
+##### .from(options, callback)
 Asynchronously loads specified page and invokes `callback(err, response, result)`. It passes `response` object to `callback` in case if you need response headers or status codes. The first argument can be either a `url` or an `options` object.
 The set of options is the same as in @mikeal's [request](https://github.com/mikeal/request#requestoptions-callback), so you can use POST method, set request headers or do any other advanced setup for the page request.
 
@@ -143,7 +143,7 @@ ineed.collect.title.from({
 ```
 
 
-###.collect action
+### .collect action
 Collects information specified by plugin set. The `result` of the action is an object that contains individual plugin outputs as properties.
 
 *Example*:
@@ -175,7 +175,7 @@ Built-in plugins:
 *Remark:* All URLs are collected in respect to `<base>` tag. The resulting URL will be an absolute URL if `.from()` method was used, `<base>` tag constains absolute URL or raw collected URL is already absolute.
 
 
-###.reprocess action
+### .reprocess action
 Applies plugins' replacing functions to the source HTML-string. The `result` of the action is the reprocessed HTML-string.
 
 *Example*:
@@ -205,7 +205,7 @@ Built-in plugins:
 `.texts(replacer)`| `replacer(text, escapeHtmlFunc)`| Replaces `text` with the value returned by `replacer`. Returned value will be not HTML escaped, so HTML code can be used as `replacer` result. You can manually apply `escapeHtmlFunc(str)` to force HTML escaping of the result.
 `.title(replacer)`|`replacer(title)` | Replaces page `title` with the value returned by `replacer`.
 
-##Custom plugins
+## Custom plugins
 There are two kinds of plugins: those that extends `.collect` action and those that extends `.reprocess` action. To enable plugin use `.using()` function, which will return new instance of `ineed` with enabled plugin.
 
 *Example:*
@@ -217,10 +217,10 @@ ineed
     ...
 ```
 
-###Common structure
+### Common structure
 
 Plugins of both kinds are objects and in addition to the kind-specific properties they should have the following properties:
-####.extends
+#### .extends
 Indicates which action will be extended by plugin. Can be `'collect'` or `'reprocess'`. Required property.
 
 #### .name
@@ -248,16 +248,16 @@ If it extends `.reprocess`:
 #### .init(ctx, ...)
 Function that initializes plugin. Required field. It always receives `ctx` object as it first argument. `ctx` contains
 some useful common information regarding current pipeline state:
-#####ctx.baseUrl 
+##### ctx.baseUrl 
 Base URL of all resources on the page with respect to `<base>` tag.
 
-#####ctx.leadingStartTag
+##### ctx.leadingStartTag
 Leading non-self-closing start tag for the current HTML token. Can be used to determine parent of the text nodes. Will be `null` if the leading start tag was self-closing or any leading end tag was met.
 
-#####ctx.inBody
+##### ctx.inBody
 Indicates if emitted tokens are in `<body>` tag. 
 
-####Token handlers
+#### Token handlers
 Plugin can have one or more HTML token handlers:
 *  `.onDoctype(doctype)`
  
@@ -285,7 +285,7 @@ Where `startTag`:
 *  `.onComment(commentText)`
 
 
-###Collecting plugins
+### Collecting plugins
 Collecting plugins in addition to [common properties](#common-structure) should have `.getCollection()` method that should return items collected by plugin.
 
 *Example of the collecting plugin:*
@@ -323,7 +323,7 @@ var results = ineed.using(plugin).collect.tagNamesInBody.fromHtml(html);
 console.log(results.tagNamesInBody);
 ```
 
-###Reprocessing plugins
+### Reprocessing plugins
 Reprocessing plugin's `init` method in addition to `ctx` object receives all arguments passed to plugin in pipeline (e.g. `replacer()` function). If token handler returns `null` then token will be deleted from the pipeline and no farther processing by other plugins will be performed on it and it will not appear in the resulting HTML. If handler returns modified token then it will be passed to the farther plugins and will appear in the resulting HTML. If handler doesn't returns value or returns `undefined` then token will be passed unmodified to the farther plugins.
 
 *Example of the reprocessing plugin:*
@@ -371,15 +371,15 @@ var reprocessedHtml = ineed
 
 ```
 
-##Testing
+## Testing
 ```
 $ npm test
 ```
 
-##Questions or suggestions?
+## Questions or suggestions?
 If you have any questions, please feel free to create an issue [here on github](https://github.com/inikulin/ineed/issues).
 
 
-##Author
+## Author
 [Ivan Nikulin](https://github.com/inikulin) (ifaaan@gmail.com)
 
